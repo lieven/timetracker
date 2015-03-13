@@ -1,0 +1,497 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F1E13A381AB36D1C00308521 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A371AB36D1C00308521 /* AppDelegate.m */; };
+		F1E13A3A1AB36D1C00308521 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A391AB36D1C00308521 /* main.m */; };
+		F1E13A3C1AB36D1C00308521 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F1E13A3B1AB36D1C00308521 /* Images.xcassets */; };
+		F1E13A3F1AB36D1C00308521 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = F1E13A3D1AB36D1C00308521 /* MainMenu.xib */; };
+		F1E13A4B1AB36D1C00308521 /* TimeTrackerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A4A1AB36D1C00308521 /* TimeTrackerTests.m */; };
+		F1E13A5A1AB371E000308521 /* timer.png in Resources */ = {isa = PBXBuildFile; fileRef = F1E13A581AB371E000308521 /* timer.png */; };
+		F1E13A5B1AB371E000308521 /* timer@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F1E13A591AB371E000308521 /* timer@2x.png */; };
+		F1E13A681AB372DC00308521 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A5E1AB372DC00308521 /* FMDatabase.m */; };
+		F1E13A691AB372DC00308521 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A601AB372DC00308521 /* FMDatabaseAdditions.m */; };
+		F1E13A6A1AB372DC00308521 /* FMDatabasePool.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A621AB372DC00308521 /* FMDatabasePool.m */; };
+		F1E13A6B1AB372DC00308521 /* FMDatabaseQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A641AB372DC00308521 /* FMDatabaseQueue.m */; };
+		F1E13A6C1AB372DC00308521 /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A671AB372DC00308521 /* FMResultSet.m */; };
+		F1E13A6E1AB372EE00308521 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F1E13A6D1AB372EE00308521 /* libsqlite3.dylib */; };
+		F1E13A711AB3734000308521 /* TTDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A701AB3734000308521 /* TTDatabase.m */; };
+		F1E13A741AB375A100308521 /* TTController.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A731AB375A100308521 /* TTController.m */; };
+		F1E13A771AB3790200308521 /* TTProject.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A761AB3790200308521 /* TTProject.m */; };
+		F1E13A7A1AB394AA00308521 /* TTEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A791AB394AA00308521 /* TTEvent.m */; };
+		F1E13A7D1AB39E1000308521 /* TTTask.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A7C1AB39E1000308521 /* TTTask.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F1E13A451AB36D1C00308521 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F1E13A291AB36D1C00308521 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F1E13A301AB36D1C00308521;
+			remoteInfo = TimeTracker;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		F1E13A311AB36D1C00308521 /* TimeTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TimeTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F1E13A351AB36D1C00308521 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F1E13A361AB36D1C00308521 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		F1E13A371AB36D1C00308521 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		F1E13A391AB36D1C00308521 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		F1E13A3B1AB36D1C00308521 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		F1E13A3E1AB36D1C00308521 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		F1E13A441AB36D1C00308521 /* TimeTrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TimeTrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F1E13A491AB36D1C00308521 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F1E13A4A1AB36D1C00308521 /* TimeTrackerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TimeTrackerTests.m; sourceTree = "<group>"; };
+		F1E13A581AB371E000308521 /* timer.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = timer.png; sourceTree = "<group>"; };
+		F1E13A591AB371E000308521 /* timer@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "timer@2x.png"; sourceTree = "<group>"; };
+		F1E13A5D1AB372DC00308521 /* FMDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabase.h; sourceTree = "<group>"; };
+		F1E13A5E1AB372DC00308521 /* FMDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabase.m; sourceTree = "<group>"; };
+		F1E13A5F1AB372DC00308521 /* FMDatabaseAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabaseAdditions.h; sourceTree = "<group>"; };
+		F1E13A601AB372DC00308521 /* FMDatabaseAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabaseAdditions.m; sourceTree = "<group>"; };
+		F1E13A611AB372DC00308521 /* FMDatabasePool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabasePool.h; sourceTree = "<group>"; };
+		F1E13A621AB372DC00308521 /* FMDatabasePool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabasePool.m; sourceTree = "<group>"; };
+		F1E13A631AB372DC00308521 /* FMDatabaseQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabaseQueue.h; sourceTree = "<group>"; };
+		F1E13A641AB372DC00308521 /* FMDatabaseQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabaseQueue.m; sourceTree = "<group>"; };
+		F1E13A651AB372DC00308521 /* FMDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDB.h; sourceTree = "<group>"; };
+		F1E13A661AB372DC00308521 /* FMResultSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMResultSet.h; sourceTree = "<group>"; };
+		F1E13A671AB372DC00308521 /* FMResultSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMResultSet.m; sourceTree = "<group>"; };
+		F1E13A6D1AB372EE00308521 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
+		F1E13A6F1AB3734000308521 /* TTDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTDatabase.h; sourceTree = "<group>"; };
+		F1E13A701AB3734000308521 /* TTDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTDatabase.m; sourceTree = "<group>"; };
+		F1E13A721AB375A100308521 /* TTController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTController.h; sourceTree = "<group>"; };
+		F1E13A731AB375A100308521 /* TTController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTController.m; sourceTree = "<group>"; };
+		F1E13A751AB3790200308521 /* TTProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTProject.h; sourceTree = "<group>"; };
+		F1E13A761AB3790200308521 /* TTProject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTProject.m; sourceTree = "<group>"; };
+		F1E13A781AB394AA00308521 /* TTEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTEvent.h; sourceTree = "<group>"; };
+		F1E13A791AB394AA00308521 /* TTEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTEvent.m; sourceTree = "<group>"; };
+		F1E13A7B1AB39E1000308521 /* TTTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTTask.h; sourceTree = "<group>"; };
+		F1E13A7C1AB39E1000308521 /* TTTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTTask.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F1E13A2E1AB36D1C00308521 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F1E13A6E1AB372EE00308521 /* libsqlite3.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F1E13A411AB36D1C00308521 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F1E13A281AB36D1C00308521 = {
+			isa = PBXGroup;
+			children = (
+				F1E13A6D1AB372EE00308521 /* libsqlite3.dylib */,
+				F1E13A5C1AB372DC00308521 /* fmdb */,
+				F1E13A331AB36D1C00308521 /* TimeTracker */,
+				F1E13A471AB36D1C00308521 /* TimeTrackerTests */,
+				F1E13A321AB36D1C00308521 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F1E13A321AB36D1C00308521 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F1E13A311AB36D1C00308521 /* TimeTracker.app */,
+				F1E13A441AB36D1C00308521 /* TimeTrackerTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F1E13A331AB36D1C00308521 /* TimeTracker */ = {
+			isa = PBXGroup;
+			children = (
+				F1E13A361AB36D1C00308521 /* AppDelegate.h */,
+				F1E13A371AB36D1C00308521 /* AppDelegate.m */,
+				F1E13A3B1AB36D1C00308521 /* Images.xcassets */,
+				F1E13A3D1AB36D1C00308521 /* MainMenu.xib */,
+				F1E13A341AB36D1C00308521 /* Supporting Files */,
+				F1E13A751AB3790200308521 /* TTProject.h */,
+				F1E13A761AB3790200308521 /* TTProject.m */,
+				F1E13A7B1AB39E1000308521 /* TTTask.h */,
+				F1E13A7C1AB39E1000308521 /* TTTask.m */,
+				F1E13A781AB394AA00308521 /* TTEvent.h */,
+				F1E13A791AB394AA00308521 /* TTEvent.m */,
+				F1E13A6F1AB3734000308521 /* TTDatabase.h */,
+				F1E13A701AB3734000308521 /* TTDatabase.m */,
+				F1E13A721AB375A100308521 /* TTController.h */,
+				F1E13A731AB375A100308521 /* TTController.m */,
+			);
+			path = TimeTracker;
+			sourceTree = "<group>";
+		};
+		F1E13A341AB36D1C00308521 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F1E13A581AB371E000308521 /* timer.png */,
+				F1E13A591AB371E000308521 /* timer@2x.png */,
+				F1E13A351AB36D1C00308521 /* Info.plist */,
+				F1E13A391AB36D1C00308521 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		F1E13A471AB36D1C00308521 /* TimeTrackerTests */ = {
+			isa = PBXGroup;
+			children = (
+				F1E13A4A1AB36D1C00308521 /* TimeTrackerTests.m */,
+				F1E13A481AB36D1C00308521 /* Supporting Files */,
+			);
+			path = TimeTrackerTests;
+			sourceTree = "<group>";
+		};
+		F1E13A481AB36D1C00308521 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F1E13A491AB36D1C00308521 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		F1E13A5C1AB372DC00308521 /* fmdb */ = {
+			isa = PBXGroup;
+			children = (
+				F1E13A5D1AB372DC00308521 /* FMDatabase.h */,
+				F1E13A5E1AB372DC00308521 /* FMDatabase.m */,
+				F1E13A5F1AB372DC00308521 /* FMDatabaseAdditions.h */,
+				F1E13A601AB372DC00308521 /* FMDatabaseAdditions.m */,
+				F1E13A611AB372DC00308521 /* FMDatabasePool.h */,
+				F1E13A621AB372DC00308521 /* FMDatabasePool.m */,
+				F1E13A631AB372DC00308521 /* FMDatabaseQueue.h */,
+				F1E13A641AB372DC00308521 /* FMDatabaseQueue.m */,
+				F1E13A651AB372DC00308521 /* FMDB.h */,
+				F1E13A661AB372DC00308521 /* FMResultSet.h */,
+				F1E13A671AB372DC00308521 /* FMResultSet.m */,
+			);
+			name = fmdb;
+			path = fmdb/src/fmdb;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F1E13A301AB36D1C00308521 /* TimeTracker */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F1E13A4E1AB36D1C00308521 /* Build configuration list for PBXNativeTarget "TimeTracker" */;
+			buildPhases = (
+				F1E13A2D1AB36D1C00308521 /* Sources */,
+				F1E13A2E1AB36D1C00308521 /* Frameworks */,
+				F1E13A2F1AB36D1C00308521 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TimeTracker;
+			productName = TimeTracker;
+			productReference = F1E13A311AB36D1C00308521 /* TimeTracker.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F1E13A431AB36D1C00308521 /* TimeTrackerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F1E13A511AB36D1C00308521 /* Build configuration list for PBXNativeTarget "TimeTrackerTests" */;
+			buildPhases = (
+				F1E13A401AB36D1C00308521 /* Sources */,
+				F1E13A411AB36D1C00308521 /* Frameworks */,
+				F1E13A421AB36D1C00308521 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F1E13A461AB36D1C00308521 /* PBXTargetDependency */,
+			);
+			name = TimeTrackerTests;
+			productName = TimeTrackerTests;
+			productReference = F1E13A441AB36D1C00308521 /* TimeTrackerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F1E13A291AB36D1C00308521 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = TT;
+				LastUpgradeCheck = 0620;
+				ORGANIZATIONNAME = "Plane Tree Software";
+				TargetAttributes = {
+					F1E13A301AB36D1C00308521 = {
+						CreatedOnToolsVersion = 6.2;
+					};
+					F1E13A431AB36D1C00308521 = {
+						CreatedOnToolsVersion = 6.2;
+						TestTargetID = F1E13A301AB36D1C00308521;
+					};
+				};
+			};
+			buildConfigurationList = F1E13A2C1AB36D1C00308521 /* Build configuration list for PBXProject "TimeTracker" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = F1E13A281AB36D1C00308521;
+			productRefGroup = F1E13A321AB36D1C00308521 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F1E13A301AB36D1C00308521 /* TimeTracker */,
+				F1E13A431AB36D1C00308521 /* TimeTrackerTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F1E13A2F1AB36D1C00308521 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F1E13A3C1AB36D1C00308521 /* Images.xcassets in Resources */,
+				F1E13A3F1AB36D1C00308521 /* MainMenu.xib in Resources */,
+				F1E13A5B1AB371E000308521 /* timer@2x.png in Resources */,
+				F1E13A5A1AB371E000308521 /* timer.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F1E13A421AB36D1C00308521 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F1E13A2D1AB36D1C00308521 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F1E13A681AB372DC00308521 /* FMDatabase.m in Sources */,
+				F1E13A7A1AB394AA00308521 /* TTEvent.m in Sources */,
+				F1E13A771AB3790200308521 /* TTProject.m in Sources */,
+				F1E13A3A1AB36D1C00308521 /* main.m in Sources */,
+				F1E13A6C1AB372DC00308521 /* FMResultSet.m in Sources */,
+				F1E13A6A1AB372DC00308521 /* FMDatabasePool.m in Sources */,
+				F1E13A741AB375A100308521 /* TTController.m in Sources */,
+				F1E13A711AB3734000308521 /* TTDatabase.m in Sources */,
+				F1E13A381AB36D1C00308521 /* AppDelegate.m in Sources */,
+				F1E13A691AB372DC00308521 /* FMDatabaseAdditions.m in Sources */,
+				F1E13A7D1AB39E1000308521 /* TTTask.m in Sources */,
+				F1E13A6B1AB372DC00308521 /* FMDatabaseQueue.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F1E13A401AB36D1C00308521 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F1E13A4B1AB36D1C00308521 /* TimeTrackerTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F1E13A461AB36D1C00308521 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F1E13A301AB36D1C00308521 /* TimeTracker */;
+			targetProxy = F1E13A451AB36D1C00308521 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		F1E13A3D1AB36D1C00308521 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F1E13A3E1AB36D1C00308521 /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		F1E13A4C1AB36D1C00308521 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		F1E13A4D1AB36D1C00308521 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		F1E13A4F1AB36D1C00308521 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = TimeTracker/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		F1E13A501AB36D1C00308521 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = TimeTracker/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		F1E13A521AB36D1C00308521 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = TimeTrackerTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TimeTracker.app/Contents/MacOS/TimeTracker";
+			};
+			name = Debug;
+		};
+		F1E13A531AB36D1C00308521 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = TimeTrackerTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TimeTracker.app/Contents/MacOS/TimeTracker";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F1E13A2C1AB36D1C00308521 /* Build configuration list for PBXProject "TimeTracker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F1E13A4C1AB36D1C00308521 /* Debug */,
+				F1E13A4D1AB36D1C00308521 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F1E13A4E1AB36D1C00308521 /* Build configuration list for PBXNativeTarget "TimeTracker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F1E13A4F1AB36D1C00308521 /* Debug */,
+				F1E13A501AB36D1C00308521 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		F1E13A511AB36D1C00308521 /* Build configuration list for PBXNativeTarget "TimeTrackerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F1E13A521AB36D1C00308521 /* Debug */,
+				F1E13A531AB36D1C00308521 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F1E13A291AB36D1C00308521 /* Project object */;
+}
