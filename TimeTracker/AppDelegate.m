@@ -18,6 +18,7 @@
 @property (nonatomic, strong) NSMenuItem * projectsSubmenuItem;
 @property (nonatomic, strong) NSMenu * projectsSubmenu;
 @property (nonatomic, strong) NSArray * projects;
+@property (nonatomic, strong) NSArray * tasks;
 
 @property (nonatomic, assign, getter=isTracking) BOOL tracking;
 
@@ -32,7 +33,7 @@
 	self.statusItem.image = [NSImage imageNamed:@"timer"];
 	self.statusItem.highlightMode = YES;
 	
-	self.menu = [[NSMenu alloc] initWithTitle:@"TimeTracker"];
+	self.menu = [[NSMenu alloc] initWithTitle:@""];
 	[self reloadMenu];
 	
 	self.statusItem.menu = self.menu;
@@ -40,30 +41,51 @@
 
 - (void)applicationWillTerminate:(NSNotification *)inNotification
 {
-	// Insert code here to tear down your application
+	[[TTController controller] setCurrentProject:nil task:nil];
+}
+
+- (void)addItems:(NSArray *)inItems toMenu:(NSMenu *)inMenu action:(SEL)inAction overflow:(NSString *)inOverflowTitle titleKey:(NSString *)inTitleKey update:(void (^)(id inItem, NSMenuItem * inMenuItem))inUpdateBlock
+{
+	NSInteger tag = 0;
+	NSInteger maxItems = 5;
+	
+	if (inItems.count <= maxItems)
+	{
+		maxItems = NSIntegerMax;
+	}
+	
+	NSMenu * menu = inMenu;
+	
+	for (id item in inItems)
+	{
+		NSString * title = [item valueForKey:inTitleKey];
+		
+		NSMenuItem * menuItem = [menu addItemWithTitle:title action:inAction keyEquivalent:@""];
+		menuItem.tag = tag++;
+		
+		inUpdateBlock(item, menuItem);
+		
+		if (tag+1 == maxItems)
+		{
+			NSMenuItem * overflowMenuItem = [menu addItemWithTitle:inOverflowTitle action:nil keyEquivalent:@""];
+			overflowMenuItem.submenu = [[NSMenu alloc] initWithTitle:@""];
+			menu = overflowMenuItem.submenu;
+			
+			inUpdateBlock(nil, overflowMenuItem);
+		}
+	}
 }
 
 - (void)reloadMenu
 {
 	[self.menu removeAllItems];
 	
-	// Tasks
-	// -
-	// Projects
-	// Stop tracking
-	// -
-	// Quit
-	
 	TTController * controller = [TTController controller];
 	
-	if (controller.currentProjectID)
-	{
-		NSMenuItem * titleItem = [self.menu addItemWithTitle:@"Tasks" action:nil keyEquivalent:@""];
-		titleItem.enabled = NO;
-		
-		[self.menu addItemWithTitle:@"Add Task..." action:@selector(addTask:) keyEquivalent:@""];
-	}
+	__block TTProject * currentProject = nil;
+	__block TTTask * currentTask = nil;
 	
+	// Projects
 	
 	self.projectsSubmenu = [[NSMenu alloc] initWithTitle:@""];
 	
@@ -72,22 +94,18 @@
 		[NSSortDescriptor sortDescriptorWithKey:@"self.name" ascending:YES]
 	]];
 	
-	NSInteger projectTag = 0;
-	TTProject * currentProject = nil;
-	
-	for (TTProject * project in self.projects)
-	{
-		NSMenuItem * projectMenuItem = [self.projectsSubmenu addItemWithTitle:project.name action:@selector(selectProject:) keyEquivalent:@""];
-		projectMenuItem.tag = projectTag++;
-		
-		if ([controller.currentProjectID isEqualTo:project.identifier])
+	[self addItems:self.projects toMenu:self.projectsSubmenu action:@selector(selectProject:) overflow:@"Older Projects" titleKey:@"name"
+		update:^(TTProject * inProject, NSMenuItem * inMenuItem)
 		{
-			projectMenuItem.state = NSOnState;
-			currentProject = project;
+			if (currentProject == nil && [controller.currentProjectID isEqualTo:inProject.identifier])
+			{
+				currentProject = inProject;
+				inMenuItem.state = NSOnState;
+			}
 		}
-	}
+	];
 	
-	if (projectTag > 0)
+	if (self.projects.count > 0)
 	{
 		[self.projectsSubmenu addItem:[NSMenuItem separatorItem]];
 	}
@@ -98,7 +116,54 @@
 	if (currentProject)
 	{
 		projectsItemTitle = [@"Project: " stringByAppendingString:currentProject.name ?: @"<unknown>"];
-		self.statusItem.title = currentProject.name;
+	}
+	
+	self.projectsSubmenuItem = [[NSMenuItem alloc] initWithTitle:projectsItemTitle action:nil keyEquivalent:@""];
+	self.projectsSubmenuItem.submenu = self.projectsSubmenu;
+	
+	[self.menu addItem:self.projectsSubmenuItem];
+	
+	[self.menu addItem:[NSMenuItem separatorItem]];
+	
+	
+	if (currentProject)
+	{
+		self.tasks = [controller.tasks sortedArrayUsingDescriptors:@[
+			[NSSortDescriptor sortDescriptorWithKey:@"self.lastUse" ascending:NO],
+			[NSSortDescriptor sortDescriptorWithKey:@"self.name" ascending:YES]
+		]];
+		
+		NSMenu * menu = self.menu;
+		
+		[self addItems:self.tasks toMenu:menu action:@selector(selectTask:) overflow:@"Older Tasks" titleKey:@"name"
+			update:^(TTTask * inTask, NSMenuItem * inMenuItem)
+			{
+				if (currentTask == nil && [controller.currentTaskID isEqualTo:inTask.identifier])
+				{
+					currentTask = inTask;
+					inMenuItem.state = NSOnState;
+				}
+			}
+		];
+		
+		[self.menu addItemWithTitle:@"Add Task..." action:@selector(addTask:) keyEquivalent:@""];
+		[self.menu addItem:[NSMenuItem separatorItem]];
+	}
+	else
+	{
+		self.tasks = nil;
+	}
+	
+	if (currentProject)
+	{
+		if (currentTask)
+		{
+			self.statusItem.title = currentTask.name;
+		}
+		else
+		{
+			self.statusItem.title = currentProject.name;
+		}
 	}
 	else
 	{
@@ -106,17 +171,6 @@
 	}
 	
 	
-	self.projectsSubmenuItem = [[NSMenuItem alloc] initWithTitle:projectsItemTitle action:nil keyEquivalent:@""];
-	self.projectsSubmenuItem.submenu = self.projectsSubmenu;
-	
-	[self.menu addItem:self.projectsSubmenuItem];
-	
-	if (currentProject)
-	{
-		[self.menu addItemWithTitle:@"Stop Tracking" action:@selector(stopTracking:) keyEquivalent:@""];
-	}
-	
-	[self.menu addItem:[NSMenuItem separatorItem]];
 	
 	[self.menu addItemWithTitle:@"Quit" action:@selector(terminate:) keyEquivalent:@"q"];
 	
@@ -131,9 +185,9 @@
 	return inString;
 }
 
-- (TTProject *)projectAtIndex:(NSInteger)inIndex
+- (TTProject *)projectAtIndex:(NSUInteger)inIndex
 {
-	if (inIndex >= 0 && inIndex < self.projects.count)
+	if (inIndex < self.projects.count)
 	{
 		return self.projects[inIndex];
 	}
@@ -180,12 +234,6 @@
 	
 }
 
-- (void)stopTracking:(NSMenuItem *)inSender
-{
-	[[TTController controller] setCurrentProject:nil task:nil];
-	[self reloadMenu];
-}
-
 - (void)addTask:(NSMenuItem *)inSender
 {
 	__weak typeof(self) weakSelf = self;
@@ -197,6 +245,29 @@
 			[weakSelf reloadMenu];
 		}
 	];
+}
+
+- (TTTask *)taskAtIndex:(NSUInteger)inIndex
+{
+	if (inIndex < self.tasks.count)
+	{
+		return self.tasks[inIndex];
+	}
+	return nil;
+}
+
+- (void)selectTask:(NSMenuItem *)inSender
+{
+	TTTask * task = [self taskAtIndex:inSender.tag];
+	if (task)
+	{
+		TTController * controller = [TTController controller];
+		task.lastUse = [NSDate date];
+		[controller saveTask:task];
+		
+		[controller setCurrentProject:controller.currentProjectID task:task.identifier];
+		[self reloadMenu];
+	}
 }
 
 

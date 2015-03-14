@@ -21,7 +21,11 @@
 
 - (BOOL)saveProject:(TTProject *)inProject;
 
+- (NSArray *)getTasks:(NSString *)inProjectID;
+
 - (TTTask *)addTaskWithName:(NSString *)inName project:(NSString *)inProjectID;
+
+- (BOOL)saveTask:(TTTask *)inTask;
 
 - (TTEvent *)addEvent:(NSDate *)inTime project:(NSString *)inProjectID task:(NSString *)inTaskID;
 

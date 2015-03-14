@@ -15,13 +15,16 @@
 + (TTController *)controller;
 
 @property (nonatomic, readonly, copy) NSString * currentProjectID;
+@property (nonatomic, readonly, copy) NSString * currentTaskID;
 
 @property (nonatomic, readonly, strong) NSArray * projects;
+@property (nonatomic, readonly, strong) NSArray * tasks;
 
 - (TTProject *)addProjectWithName:(NSString *)inName;
 - (BOOL)saveProject:(TTProject *)inProject;
 
 - (TTTask *)addTaskWithName:(NSString *)inName;
+- (BOOL)saveTask:(TTTask *)inTask;
 
 - (void)setCurrentProject:(NSString *)inProjectID task:(NSString *)inTaskID;
 - (void)setCurrentProject:(NSString *)inProjectID task:(NSString *)inTaskID time:(NSDate *)inTime;

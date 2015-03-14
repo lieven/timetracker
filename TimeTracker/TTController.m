@@ -45,6 +45,7 @@ NSDate * TTStartOfDay(NSDate * inDate)
 @implementation TTController
 {
 	NSMutableArray * _projects;
+	NSMutableArray * _tasks;
 }
 
 + (instancetype)controller
@@ -90,13 +91,32 @@ NSDate * TTStartOfDay(NSDate * inDate)
 	return [self.database saveProject:inProject];
 }
 
+- (NSArray *)tasks
+{
+	if (_tasks == nil && self.currentProjectID)
+	{
+		_tasks = [[self.database getTasks:self.currentProjectID] mutableCopy];
+	}
+	return _tasks;
+	
+}
+
 - (TTTask *)addTaskWithName:(NSString *)inName
 {
 	if (self.currentProjectID)
 	{
-		return [self.database addTaskWithName:inName project:self.currentProjectID];
+		TTTask * task = [self.database addTaskWithName:inName project:self.currentProjectID];
+		if (task)
+		{
+			[_tasks addObject:task];
+		}
 	}
 	return nil;
+}
+
+- (BOOL)saveTask:(TTTask *)inTask
+{
+	return [self.database saveTask:inTask];
 }
 
 - (void)setCurrentProject:(NSString *)inProjectID task:(NSString *)inTaskID
@@ -106,6 +126,11 @@ NSDate * TTStartOfDay(NSDate * inDate)
 
 - (void)setCurrentProject:(NSString *)inProjectID task:(NSString *)inTaskID time:(NSDate *)inTime
 {
+	if (! TTEqualOrBothZero(self.currentProjectID, inProjectID))
+	{
+		_tasks = nil;
+	}
+	
 	self.currentProjectID = inProjectID;
 	self.currentTaskID = inTaskID;
 	

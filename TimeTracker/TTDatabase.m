@@ -133,6 +133,32 @@
 }
 
 
+- (NSArray *)getTasks:(NSString *)inProjectID
+{
+	__block NSMutableArray * tasks = nil;
+	
+	if (inProjectID)
+	{
+		[self.queue inDatabase:^(FMDatabase *db) {
+			tasks = [NSMutableArray new];
+			
+			FMResultSet * results = [db executeQuery:@"SELECT * FROM Tasks WHERE project=?", inProjectID];
+			while ([results next])
+			{
+				TTTask * task = [TTTask new];
+				task.identifier = [results stringForColumn:@"identifier"];
+				task.project = [results stringForColumn:@"project"];
+				task.name = [results stringForColumn:@"name"];
+				task.lastUse = [results dateForColumn:@"lastUse"];
+				[tasks addObject:task];
+			}
+		}];
+	}
+	
+	return tasks;
+}
+
+
 - (TTTask *)addTaskWithName:(NSString *)inName project:(NSString *)inProjectID
 {
 	__block TTTask * task = nil;
@@ -146,7 +172,7 @@
 			BOOL inserted = [db executeUpdate:@"INSERT INTO Tasks (name, project, lastUse) VALUES(?, ?, ?)", inName, inProjectID, lastUse];
 			if (inserted)
 			{
-				TTTask * task = [TTTask new];
+				task = [TTTask new];
 				task.identifier = [@(db.lastInsertRowId) stringValue];
 				task.project = inProjectID;
 				task.name = inName;
@@ -156,6 +182,18 @@
 	}
 	
 	return task;
+}
+
+- (BOOL)saveTask:(TTTask *)inTask
+{
+	__block BOOL saved = NO;
+	if (inTask.identifier)
+	{
+		[self.queue inDatabase:^(FMDatabase *db) {
+			saved = [db executeUpdate:@"UPDATE Tasks SET name=?, lastUse=? WHERE identifier=?", inTask.name, inTask.lastUse, inTask.identifier];
+		}];
+	}
+	return saved;
 }
 
 - (TTEvent *)addEvent:(NSDate *)inTime project:(NSString *)inProjectID task:(NSString *)inTaskID
