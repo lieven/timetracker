@@ -11,8 +11,8 @@
 @interface TTEvent : NSObject
 
 @property (nonatomic, copy) NSString * identifier;
-@property (nonatomic, copy) NSString * project;
-@property (nonatomic, copy) NSString * task;
+@property (nonatomic, copy) NSString * projectName;
+@property (nonatomic, copy) NSString * taskName;
 @property (nonatomic, copy) NSDate * time;
 
 @end // TTEvent

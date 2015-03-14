@@ -148,11 +148,20 @@
 		
 		[self.menu addItemWithTitle:@"Add Task..." action:@selector(addTask:) keyEquivalent:@""];
 		[self.menu addItem:[NSMenuItem separatorItem]];
+		
+		[self.menu addItemWithTitle:@"Stop Tracking" action:@selector(stopTracking:) keyEquivalent:@""];
 	}
 	else
 	{
 		self.tasks = nil;
 	}
+	
+	[self.menu addItemWithTitle:@"Copy Today's Log" action:@selector(copyTodaysLog:) keyEquivalent:@""];
+	
+	[self.menu addItemWithTitle:@"Quit" action:@selector(terminate:) keyEquivalent:@"q"];
+	
+	
+	// Update main menu title
 	
 	if (currentProject)
 	{
@@ -167,13 +176,8 @@
 	}
 	else
 	{
-		self.statusItem.title = @"...";
+		self.statusItem.title = @"";
 	}
-	
-	
-	
-	[self.menu addItemWithTitle:@"Quit" action:@selector(terminate:) keyEquivalent:@"q"];
-	
 }
 
 - (NSString *)truncateString:(NSString *)inString to:(NSUInteger)inMaxLength
@@ -270,6 +274,52 @@
 	}
 }
 
+- (void)stopTracking:(NSMenuItem *)inSender
+{
+	[[TTController controller] setCurrentProject:nil task:nil];
+	[self reloadMenu];
+}
+
+- (void)copyTodaysLog:(NSMenuItem *)inSender
+{
+	NSMutableString * log = [NSMutableString new];
+	
+	NSArray * events = [[TTController controller] getTodaysEvents];
+	
+	TTEvent * previousEvent = nil;
+	
+	
+	for (TTEvent * event in events)
+	{
+		BOOL changedProject = ! TTEqualOrBothZero(event.projectName, previousEvent.projectName);
+		if (changedProject)
+		{
+			if (event.projectName)
+			{
+				[log appendFormat:@"%@: %@\n", [NSDateFormatter localizedStringFromDate:event.time dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle], event.projectName];
+			}
+			else
+			{
+				[log appendFormat:@"%@\n\n", [NSDateFormatter localizedStringFromDate:event.time dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle]];
+			}
+		}
+		
+		if (! TTEqualOrBothZero(event.taskName, previousEvent.taskName))
+		{
+			if (event.taskName)
+			{
+				[log appendFormat:@"    %@: %@\n", [NSDateFormatter localizedStringFromDate:event.time dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle], event.taskName];
+			}
+		}
+		
+		previousEvent = event;
+	}
+	
+	NSLog(@"Log:\n%@", log);
+	
+	[[NSPasteboard generalPasteboard] declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
+	[[NSPasteboard generalPasteboard] setString:log forType:NSStringPboardType];
+}
 
 - (void)showInputAlert:(NSString *)inMessage confirmButton:(NSString *)inConfirmButton completion:(void (^)(NSString * inInputText))inCompletionBlock
 {

@@ -8,7 +8,9 @@
 
 #import "TTProject.h"
 #import "TTTask.h"
+#import "TTEvent.h"
 
+BOOL TTEqualOrBothZero(id inObject1, id inObject2);
 
 @interface TTController : NSObject
 

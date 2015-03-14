@@ -196,21 +196,13 @@
 	return saved;
 }
 
-- (TTEvent *)addEvent:(NSDate *)inTime project:(NSString *)inProjectID task:(NSString *)inTaskID
+- (BOOL)addEvent:(NSDate *)inTime project:(NSString *)inProjectID task:(NSString *)inTaskID
 {
-	__block TTEvent * event = nil;
+	__block BOOL inserted = YES;
 	[self.queue inDatabase:^(FMDatabase *db) {
-		BOOL inserted = [db executeUpdate:@"INSERT INTO Events (`project`, `task`, `timestamp`) VALUES(?, ?, ?);", inProjectID, inTaskID, inTime];
-		if (inserted)
-		{
-			event = [TTEvent new];
-			event.identifier = [@(db.lastInsertRowId) stringValue];
-			event.time = inTime;
-			event.project = inProjectID;
-			event.task = inTaskID;
-		}
+		inserted = [db executeUpdate:@"INSERT INTO Events (`project`, `task`, `timestamp`) VALUES(?, ?, ?);", inProjectID, inTaskID, inTime];
 	}];
-	return event;
+	return inserted;
 }
 
 
@@ -219,14 +211,14 @@
 	NSMutableArray * events = [NSMutableArray new];
 	
 	[self.queue inDatabase:^(FMDatabase *db) {
-		FMResultSet * results = [db executeQuery:@"SELECT * FROM Events WHERE `timestamp` >= ? AND `timestamp` <= ?", inStartTime, inEndTime];
+		FMResultSet * results = [db executeQuery:@"SELECT e.identifier, e.timestamp, p.name AS project, t.name AS task FROM Events e LEFT JOIN Projects p ON e.project=p.identifier LEFT JOIN Tasks t ON e.task=t.identifier WHERE `timestamp` >= ? AND `timestamp` <= ?", inStartTime, inEndTime];
 		while ([results next])
 		{
 			TTEvent * event = [TTEvent new];
 			event.identifier = [results stringForColumn:@"identifier"];
 			event.time = [results dateForColumn:@"timestamp"];
-			event.project = [results stringForColumn:@"project"];
-			event.task = [results stringForColumn:@"task"];
+			event.projectName = [results stringForColumn:@"project"];
+			event.taskName = [results stringForColumn:@"task"];
 			[events addObject:event];
 		}
 	}];

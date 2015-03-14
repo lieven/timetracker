@@ -27,7 +27,7 @@
 
 - (BOOL)saveTask:(TTTask *)inTask;
 
-- (TTEvent *)addEvent:(NSDate *)inTime project:(NSString *)inProjectID task:(NSString *)inTaskID;
+- (BOOL)addEvent:(NSDate *)inTime project:(NSString *)inProjectID task:(NSString *)inTaskID;
 
 - (NSArray *)getEventsFrom:(NSDate *)inStartTime to:(NSDate *)inEndTime;
 
