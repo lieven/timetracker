@@ -9,7 +9,7 @@
 #import "TTController.h"
 #import "TTDatabase.h"
 
-BOOL TTEqualOrBothZero(id inObject1, id inObject2)
+BOOL TTEqualOrBothNil(id inObject1, id inObject2)
 {
 	if (inObject1)
 	{
@@ -126,7 +126,7 @@ NSDate * TTStartOfDay(NSDate * inDate)
 
 - (void)setCurrentProject:(NSString *)inProjectID task:(NSString *)inTaskID time:(NSDate *)inTime
 {
-	if (! TTEqualOrBothZero(self.currentProjectID, inProjectID))
+	if (! TTEqualOrBothNil(self.currentProjectID, inProjectID))
 	{
 		_tasks = nil;
 	}
@@ -137,9 +137,9 @@ NSDate * TTStartOfDay(NSDate * inDate)
 	[self.database addEvent:[NSDate date] project:inProjectID task:inTaskID];
 }
 
-- (NSArray *)getTodaysEvents
+- (NSArray *)getEventsOnDay:(NSDate *)inTimestamp
 {
-	NSDate * startOfDay = TTStartOfDay([NSDate date]);
+	NSDate * startOfDay = TTStartOfDay(inTimestamp);
 	NSDate * endOfDay = [startOfDay dateByAddingTimeInterval:24.0*60.0*60.0];
 	return [self.database getEventsFrom:startOfDay to:endOfDay];
 }

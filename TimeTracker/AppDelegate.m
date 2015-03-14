@@ -8,6 +8,8 @@
 
 #import "AppDelegate.h"
 #import "TTController.h"
+#import "TTLog.h"
+
 
 @interface AppDelegate ()
 
@@ -280,45 +282,85 @@
 	[self reloadMenu];
 }
 
-- (void)copyTodaysLog:(NSMenuItem *)inSender
+- (NSArray *)intervalStrings:(NSArray *)inIntervals
 {
-	NSMutableString * log = [NSMutableString new];
-	
-	NSArray * events = [[TTController controller] getTodaysEvents];
-	
-	TTEvent * previousEvent = nil;
-	
-	
-	for (TTEvent * event in events)
+	NSMutableArray * strings = [NSMutableArray new];
+	for (TTInterval * interval in inIntervals)
 	{
-		BOOL changedProject = ! TTEqualOrBothZero(event.projectName, previousEvent.projectName);
-		if (changedProject)
-		{
-			if (event.projectName)
-			{
-				[log appendFormat:@"%@: %@\n", [NSDateFormatter localizedStringFromDate:event.time dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle], event.projectName];
-			}
-			else
-			{
-				[log appendFormat:@"%@\n\n", [NSDateFormatter localizedStringFromDate:event.time dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle]];
-			}
-		}
-		
-		if (! TTEqualOrBothZero(event.taskName, previousEvent.taskName))
-		{
-			if (event.taskName)
-			{
-				[log appendFormat:@"    %@: %@\n", [NSDateFormatter localizedStringFromDate:event.time dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle], event.taskName];
-			}
-		}
-		
-		previousEvent = event;
+		[strings addObject:[NSString stringWithFormat:@" %@-%@",
+			[NSDateFormatter localizedStringFromDate:interval.startTime dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle],
+			[NSDateFormatter localizedStringFromDate:interval.endTime dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle]
+		]];
+	}
+	return strings;
+}
+
+- (NSString *)durationString:(NSTimeInterval)inTimeInterval
+{
+	double seconds = inTimeInterval;
+	
+	double hours = floor(seconds / 3600.0);
+	seconds -= 3600.0*hours;
+	
+	double minutes = floor(seconds / 60.0);
+	seconds -= 60.0*minutes;
+	
+	if (hours > 0.0)
+	{
+		return [NSString stringWithFormat:@"%.0fh%.0fm%.0fs", hours, minutes, seconds];
+	}
+	else if (minutes > 0.0)
+	{
+		return [NSString stringWithFormat:@"%.0fm%.0fs", minutes, seconds];
+	}
+	else
+	{
+		return [NSString stringWithFormat:@"%.0fs", seconds];
 	}
 	
-	NSLog(@"Log:\n%@", log);
+}
+
+- (void)copyTodaysLog:(NSMenuItem *)inSender
+{
+	NSMutableString * logString = [NSMutableString new];
+	
+	NSDate * now = [NSDate date];
+	
+	[logString appendString:[NSDateFormatter localizedStringFromDate:now dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterNoStyle]];
+	[logString appendString:@"\n\n"];
+	
+	NSArray * events = [[TTController controller] getEventsOnDay:now];
+	
+	TTLog * log = [TTLog new];
+	for (TTEvent * event in events)
+	{
+		[log addEvent:event];
+	}
+	
+	for (TTProjectLog * projectLog in log.projectLogs.allValues)
+	{
+		[logString appendFormat:@"%@: %@: %@\n",
+			projectLog.projectName,
+			[[self intervalStrings:projectLog.intervals] componentsJoinedByString:@", "],
+			[self durationString:projectLog.totalTime]
+		];
+		
+		for (TTTaskLog * taskLog in projectLog.taskLogs.allValues)
+		{
+			[logString appendFormat:@"- %@: %@: %@\n",
+				taskLog.taskName,
+				[[self intervalStrings:taskLog.intervals] componentsJoinedByString:@", "],
+				[self durationString:taskLog.totalTime]
+			];
+		}
+		
+		[logString appendString:@"\n"];
+	}
+	
+	NSLog(@"Log:\n%@", logString);
 	
 	[[NSPasteboard generalPasteboard] declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
-	[[NSPasteboard generalPasteboard] setString:log forType:NSStringPboardType];
+	[[NSPasteboard generalPasteboard] setString:logString forType:NSStringPboardType];
 }
 
 - (void)showInputAlert:(NSString *)inMessage confirmButton:(NSString *)inConfirmButton completion:(void (^)(NSString * inInputText))inCompletionBlock

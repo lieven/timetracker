@@ -25,6 +25,7 @@
 		F1E13A771AB3790200308521 /* TTProject.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A761AB3790200308521 /* TTProject.m */; };
 		F1E13A7A1AB394AA00308521 /* TTEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A791AB394AA00308521 /* TTEvent.m */; };
 		F1E13A7D1AB39E1000308521 /* TTTask.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A7C1AB39E1000308521 /* TTTask.m */; };
+		F1E13A801AB3C61B00308521 /* TTLog.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A7F1AB3C61B00308521 /* TTLog.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +73,8 @@
 		F1E13A791AB394AA00308521 /* TTEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTEvent.m; sourceTree = "<group>"; };
 		F1E13A7B1AB39E1000308521 /* TTTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTTask.h; sourceTree = "<group>"; };
 		F1E13A7C1AB39E1000308521 /* TTTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTTask.m; sourceTree = "<group>"; };
+		F1E13A7E1AB3C61B00308521 /* TTLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLog.h; sourceTree = "<group>"; };
+		F1E13A7F1AB3C61B00308521 /* TTLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLog.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,6 +134,8 @@
 				F1E13A701AB3734000308521 /* TTDatabase.m */,
 				F1E13A721AB375A100308521 /* TTController.h */,
 				F1E13A731AB375A100308521 /* TTController.m */,
+				F1E13A7E1AB3C61B00308521 /* TTLog.h */,
+				F1E13A7F1AB3C61B00308521 /* TTLog.m */,
 			);
 			path = TimeTracker;
 			sourceTree = "<group>";
@@ -284,6 +289,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F1E13A801AB3C61B00308521 /* TTLog.m in Sources */,
 				F1E13A681AB372DC00308521 /* FMDatabase.m in Sources */,
 				F1E13A7A1AB394AA00308521 /* TTEvent.m in Sources */,
 				F1E13A771AB3790200308521 /* TTProject.m in Sources */,
@@ -482,6 +488,7 @@
 				F1E13A501AB36D1C00308521 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		F1E13A511AB36D1C00308521 /* Build configuration list for PBXNativeTarget "TimeTrackerTests" */ = {
 			isa = XCConfigurationList;
@@ -490,6 +497,7 @@
 				F1E13A531AB36D1C00308521 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

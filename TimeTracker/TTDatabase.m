@@ -61,7 +61,7 @@
 		
 		[db executeUpdate:@"CREATE TABLE IF NOT EXISTS Projects (`identifier` INTEGER PRIMARY KEY AUTOINCREMENT, `name` VARCHAR(255) UNIQUE, lastUse REAL);"];
 		
-		[db executeUpdate:@"CREATE TABLE IF NOT EXISTS Tasks (`identifier` INTEGER PRIMARY KEY AUTOINCREMENT, `name` VARCHAR(255), `project` INT, `lastUse` REAL);"];
+		[db executeUpdate:@"CREATE TABLE IF NOT EXISTS Tasks (`identifier` INTEGER PRIMARY KEY AUTOINCREMENT, `name` VARCHAR(255) UNIQUE, `project` INT, `lastUse` REAL);"];
 		
 		[db executeUpdate:@"CREATE TABLE IF NOT EXISTS Events (`identifier` INTEGER PRIMARY KEY AUTOINCREMENT, `project` INT DEFAULT NULL, `task` INT DEFAULT NULL, `timestamp` REAL);"];
 		
@@ -211,14 +211,16 @@
 	NSMutableArray * events = [NSMutableArray new];
 	
 	[self.queue inDatabase:^(FMDatabase *db) {
-		FMResultSet * results = [db executeQuery:@"SELECT e.identifier, e.timestamp, p.name AS project, t.name AS task FROM Events e LEFT JOIN Projects p ON e.project=p.identifier LEFT JOIN Tasks t ON e.task=t.identifier WHERE `timestamp` >= ? AND `timestamp` <= ?", inStartTime, inEndTime];
+		FMResultSet * results = [db executeQuery:@"SELECT e.identifier, e.timestamp, e.project AS projectID, p.name AS projectName, e.task AS taskID, t.name AS taskName FROM Events e LEFT JOIN Projects p ON e.project=p.identifier LEFT JOIN Tasks t ON e.task=t.identifier WHERE `timestamp` >= ? AND `timestamp` <= ?", inStartTime, inEndTime];
 		while ([results next])
 		{
 			TTEvent * event = [TTEvent new];
 			event.identifier = [results stringForColumn:@"identifier"];
 			event.time = [results dateForColumn:@"timestamp"];
-			event.projectName = [results stringForColumn:@"project"];
-			event.taskName = [results stringForColumn:@"task"];
+			event.projectID = [results stringForColumn:@"projectID"];
+			event.projectName = [results stringForColumn:@"projectName"];
+			event.taskID = [results stringForColumn:@"taskID"];
+			event.taskName = [results stringForColumn:@"taskName"];
 			[events addObject:event];
 		}
 	}];
