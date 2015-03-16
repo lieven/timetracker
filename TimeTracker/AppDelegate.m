@@ -8,25 +8,8 @@
 
 #import "AppDelegate.h"
 #import "TTController.h"
-#import "TTLog.h"
+#import "TTLog+Serialisation.h"
 
-@interface NSArray (TTMap)
-- (NSArray *)tt_map:(id (^)(id inItem))inTransformation;
-@end // NSArray (TTMap)
-
-@implementation NSArray (TTMap)
-
-- (NSArray *)tt_map:(id (^)(id inItem))inTransformation
-{
-	NSMutableArray * results = [NSMutableArray new];
-	for (id item in self)
-	{
-		[results addObject:inTransformation(item)];
-	}
-	return results;
-}
-
-@end // NSArray (TTMap)
 
 
 @interface AppDelegate ()< NSMenuDelegate >
@@ -418,39 +401,9 @@
 	return logString;
 }
 
-- (NSDictionary *)intervalToDictionary:(TTInterval *)inInterval
-{
-	return @{
-		@"start": @([inInterval.startTime timeIntervalSince1970]),
-		@"end": @([inInterval.endTime timeIntervalSince1970])
-	};
-}
-
-- (NSDictionary *)projectLogToDictionary:(TTProjectLog *)inProjectLog
-{
-	return @{
-		@"project": inProjectLog.projectName ?: [NSNull null],
-		@"intervals": [inProjectLog.intervals tt_map:^id(TTInterval * inInterval) {
-			return [self intervalToDictionary:inInterval];
-		}],
-		@"duration": @(inProjectLog.totalTime),
-		@"tasks": [inProjectLog.taskLogs.allValues tt_map:^id(TTTaskLog * inTaskLog) {
-			return @{
-				@"name": inTaskLog.taskName ?: [NSNull null],
-				@"intervals": [inTaskLog.intervals tt_map:^id(TTInterval * inInterval) {
-					return [self intervalToDictionary:inInterval];
-				}],
-				@"duration": @(inTaskLog.totalTime)
-			};
-		}],
-	};
-}
-
 - (NSString *)logSummaryToJsonString:(TTLog *)inLog
 {
-	NSArray * projectLogDicts = [inLog.projectLogs.allValues tt_map:^id(TTProjectLog * inProjectLog) {
-		return [self projectLogToDictionary:inProjectLog];
-	}];
+	NSArray * projectLogDicts = [inLog toDictionaries];
 	
 	NSError * error = nil;
 	NSData * jsonData = [NSJSONSerialization dataWithJSONObject:projectLogDicts options:NSJSONWritingPrettyPrinted error:&error];

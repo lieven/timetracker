@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F124154F1AB76535002355E7 /* NSArray+TTMap.m in Sources */ = {isa = PBXBuildFile; fileRef = F124154E1AB76535002355E7 /* NSArray+TTMap.m */; };
+		F12415521AB76596002355E7 /* TTLog+Serialisation.m in Sources */ = {isa = PBXBuildFile; fileRef = F12415511AB76596002355E7 /* TTLog+Serialisation.m */; };
 		F1E13A381AB36D1C00308521 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A371AB36D1C00308521 /* AppDelegate.m */; };
 		F1E13A3A1AB36D1C00308521 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A391AB36D1C00308521 /* main.m */; };
 		F1E13A3C1AB36D1C00308521 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F1E13A3B1AB36D1C00308521 /* Images.xcassets */; };
@@ -39,6 +41,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F124154D1AB76535002355E7 /* NSArray+TTMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+TTMap.h"; sourceTree = "<group>"; };
+		F124154E1AB76535002355E7 /* NSArray+TTMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+TTMap.m"; sourceTree = "<group>"; };
+		F12415501AB76596002355E7 /* TTLog+Serialisation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TTLog+Serialisation.h"; sourceTree = "<group>"; };
+		F12415511AB76596002355E7 /* TTLog+Serialisation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "TTLog+Serialisation.m"; sourceTree = "<group>"; };
 		F1E13A311AB36D1C00308521 /* TimeTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TimeTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1E13A351AB36D1C00308521 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F1E13A361AB36D1C00308521 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -136,6 +142,10 @@
 				F1E13A731AB375A100308521 /* TTController.m */,
 				F1E13A7E1AB3C61B00308521 /* TTLog.h */,
 				F1E13A7F1AB3C61B00308521 /* TTLog.m */,
+				F124154D1AB76535002355E7 /* NSArray+TTMap.h */,
+				F124154E1AB76535002355E7 /* NSArray+TTMap.m */,
+				F12415501AB76596002355E7 /* TTLog+Serialisation.h */,
+				F12415511AB76596002355E7 /* TTLog+Serialisation.m */,
 			);
 			path = TimeTracker;
 			sourceTree = "<group>";
@@ -296,9 +306,11 @@
 				F1E13A3A1AB36D1C00308521 /* main.m in Sources */,
 				F1E13A6C1AB372DC00308521 /* FMResultSet.m in Sources */,
 				F1E13A6A1AB372DC00308521 /* FMDatabasePool.m in Sources */,
+				F124154F1AB76535002355E7 /* NSArray+TTMap.m in Sources */,
 				F1E13A741AB375A100308521 /* TTController.m in Sources */,
 				F1E13A711AB3734000308521 /* TTDatabase.m in Sources */,
 				F1E13A381AB36D1C00308521 /* AppDelegate.m in Sources */,
+				F12415521AB76596002355E7 /* TTLog+Serialisation.m in Sources */,
 				F1E13A691AB372DC00308521 /* FMDatabaseAdditions.m in Sources */,
 				F1E13A7D1AB39E1000308521 /* TTTask.m in Sources */,
 				F1E13A6B1AB372DC00308521 /* FMDatabaseQueue.m in Sources */,
