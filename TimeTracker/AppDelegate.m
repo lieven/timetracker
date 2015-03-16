@@ -11,18 +11,23 @@
 #import "TTLog.h"
 
 
-@interface AppDelegate ()
+@interface AppDelegate ()< NSMenuDelegate >
 
 @property (nonatomic, strong) NSStatusItem * statusItem;
 
 @property (nonatomic, assign) BOOL darkModeOn;
 @property (nonatomic, strong) NSMenu * menu;
-@property (nonatomic, strong) NSMenuItem * projectsSubmenuItem;
 @property (nonatomic, strong) NSMenu * projectsSubmenu;
 @property (nonatomic, strong) NSArray * projects;
 @property (nonatomic, strong) NSArray * tasks;
 
 @property (nonatomic, assign, getter=isTracking) BOOL tracking;
+
+@property (nonatomic, weak) TTProject * currentProject;
+@property (nonatomic, weak) TTTask * currentTask;
+
+@property (nonatomic, weak) NSMenuItem * currentProjectMenuItem;
+@property (nonatomic, weak) NSMenuItem * currentTaskMenuItem;
 
 @end // AppDelegate ()
 
@@ -36,6 +41,7 @@
 	self.statusItem.highlightMode = YES;
 	
 	self.menu = [[NSMenu alloc] initWithTitle:@""];
+	self.menu.delegate = self;
 	[self reloadMenu];
 	
 	self.statusItem.menu = self.menu;
@@ -78,16 +84,27 @@
 	}
 }
 
++ (NSAttributedString *)attributedTitle:(NSString *)inTitle time:(NSTimeInterval)inTimeInterval
+{
+	NSString * title = [inTitle stringByAppendingFormat:@" (%@)", [self durationString:inTimeInterval]];
+	
+	NSMutableAttributedString * attributedTitle = [[NSMutableAttributedString alloc] initWithString:title attributes:@{ NSFontAttributeName: [NSFont menuFontOfSize:0.0] }];
+	[attributedTitle addAttribute:NSForegroundColorAttributeName value:[NSColor lightGrayColor] range:NSMakeRange(inTitle.length, title.length - inTitle.length)];
+	return attributedTitle;
+}
+
 - (void)reloadMenu
 {
 	[self.menu removeAllItems];
 	
 	TTController * controller = [TTController controller];
 	
-	__block TTProject * currentProject = nil;
-	__block TTTask * currentTask = nil;
-	
 	// Projects
+	
+	__weak typeof(self) weakSelf = self;
+	
+	self.currentProject = nil;
+	self.currentTask = nil;
 	
 	self.projectsSubmenu = [[NSMenu alloc] initWithTitle:@""];
 	
@@ -99,9 +116,9 @@
 	[self addItems:self.projects toMenu:self.projectsSubmenu action:@selector(selectProject:) overflow:@"Older Projects" titleKey:@"name"
 		update:^(TTProject * inProject, NSMenuItem * inMenuItem)
 		{
-			if (currentProject == nil && [controller.currentProjectID isEqualTo:inProject.identifier])
+			if (weakSelf.currentProject == nil && [controller.currentProjectID isEqualTo:inProject.identifier])
 			{
-				currentProject = inProject;
+				weakSelf.currentProject = inProject;
 				inMenuItem.state = NSOnState;
 			}
 		}
@@ -114,22 +131,20 @@
 	
 	[self.projectsSubmenu addItemWithTitle:@"Add Project..." action:@selector(addProject:) keyEquivalent:@""];
 	
-	NSString * projectsItemTitle = @"Select Project";
-	if (currentProject)
-	{
-		projectsItemTitle = [@"Project: " stringByAppendingString:currentProject.name ?: @"<unknown>"];
-	}
 	
-	self.projectsSubmenuItem = [[NSMenuItem alloc] initWithTitle:projectsItemTitle action:nil keyEquivalent:@""];
-	self.projectsSubmenuItem.submenu = self.projectsSubmenu;
+	NSMenuItem * projectsSubmenuItem = [[NSMenuItem alloc] initWithTitle:@"Select Project" action:nil keyEquivalent:@""];
+	projectsSubmenuItem.submenu = self.projectsSubmenu;
 	
-	[self.menu addItem:self.projectsSubmenuItem];
+	[self.menu addItem:projectsSubmenuItem];
+	
+	self.currentProjectMenuItem = projectsSubmenuItem;
 	
 	[self.menu addItem:[NSMenuItem separatorItem]];
 	
 	
-	if (currentProject)
+	if (self.currentProject)
 	{
+		projectsSubmenuItem.title = self.currentProject.name ?: @"Untitled Project";
 		self.tasks = [controller.tasks sortedArrayUsingDescriptors:@[
 			[NSSortDescriptor sortDescriptorWithKey:@"self.lastUse" ascending:NO],
 			[NSSortDescriptor sortDescriptorWithKey:@"self.name" ascending:YES]
@@ -137,12 +152,14 @@
 		
 		NSMenu * menu = self.menu;
 		
+		
 		[self addItems:self.tasks toMenu:menu action:@selector(selectTask:) overflow:@"Older Tasks" titleKey:@"name"
 			update:^(TTTask * inTask, NSMenuItem * inMenuItem)
 			{
-				if (currentTask == nil && [controller.currentTaskID isEqualTo:inTask.identifier])
+				if (weakSelf.currentTask == nil && [controller.currentTaskID isEqualTo:inTask.identifier])
 				{
-					currentTask = inTask;
+					weakSelf.currentTask = inTask;
+					weakSelf.currentTaskMenuItem = inMenuItem;
 					inMenuItem.state = NSOnState;
 				}
 			}
@@ -158,6 +175,8 @@
 		self.tasks = nil;
 	}
 	
+	[self updateTime];
+	
 	[self.menu addItemWithTitle:@"Copy Today's Log" action:@selector(copyTodaysLog:) keyEquivalent:@""];
 	
 	[self.menu addItemWithTitle:@"Quit" action:@selector(terminate:) keyEquivalent:@"q"];
@@ -165,21 +184,39 @@
 	
 	// Update main menu title
 	
-	if (currentProject)
+	if (self.currentProject)
 	{
-		if (currentTask)
+		if (self.currentTask)
 		{
-			self.statusItem.title = currentTask.name;
+			self.statusItem.title = self.currentTask.name;
 		}
 		else
 		{
-			self.statusItem.title = currentProject.name;
+			self.statusItem.title = self.currentProject.name;
 		}
 	}
 	else
 	{
 		self.statusItem.title = @"";
 	}
+}
+
+- (void)updateTime
+{
+	if (self.currentProjectMenuItem && self.currentProject)
+	{
+		self.currentProjectMenuItem.attributedTitle = [AppDelegate attributedTitle:self.currentProject.name time:-[self.currentProject.lastUse timeIntervalSinceNow]];
+	}
+	
+	if (self.currentTaskMenuItem && self.currentTask)
+	{
+		self.currentTaskMenuItem.attributedTitle = [AppDelegate attributedTitle:self.currentTask.name time:-[self.currentTask.lastUse timeIntervalSinceNow]];
+	}
+}
+
+- (void)menuWillOpen:(NSMenu *)inMenu
+{
+	[self updateTime];
 }
 
 - (NSString *)truncateString:(NSString *)inString to:(NSUInteger)inMaxLength
@@ -295,7 +332,7 @@
 	return strings;
 }
 
-- (NSString *)durationString:(NSTimeInterval)inTimeInterval
++ (NSString *)durationString:(NSTimeInterval)inTimeInterval
 {
 	double seconds = inTimeInterval;
 	
@@ -342,7 +379,7 @@
 		[logString appendFormat:@"%@:%@: %@\n",
 			projectLog.projectName,
 			[[self intervalStrings:projectLog.intervals] componentsJoinedByString:@", "],
-			[self durationString:projectLog.totalTime]
+			[AppDelegate durationString:projectLog.totalTime]
 		];
 		
 		for (TTTaskLog * taskLog in projectLog.taskLogs.allValues)
@@ -350,7 +387,7 @@
 			[logString appendFormat:@"- %@:%@: %@\n",
 				taskLog.taskName,
 				[[self intervalStrings:taskLog.intervals] componentsJoinedByString:@", "],
-				[self durationString:taskLog.totalTime]
+				[AppDelegate durationString:taskLog.totalTime]
 			];
 		}
 		
