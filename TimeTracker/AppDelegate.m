@@ -191,8 +191,10 @@
 	
 	[self updateTime];
 	
-	NSMenuItem * todaysLogMenuItem = [self.menu addItemWithTitle:@"Today's Log" action:nil keyEquivalent:@""];
-	todaysLogMenuItem.submenu = self.scriptsMenu;
+	[self.menu addItemWithTitle:@"Today's Log" action:nil keyEquivalent:@""];
+	[self.menu addItemWithTitle:@"Export JSON" action:nil keyEquivalent:@""].submenu = self.scriptsMenu;
+	[self.menu addItemWithTitle:@"Copy Summary" action:@selector(copyTodaysLog:) keyEquivalent:@"c"];
+	[self.menu addItem:[NSMenuItem separatorItem]];
 	
 	[self.menu addItemWithTitle:@"Quit" action:@selector(terminate:) keyEquivalent:@"q"];
 	
@@ -394,17 +396,15 @@
 	
 	for (TTProjectLog * projectLog in inLog.projectLogs.allValues)
 	{
-		[logString appendFormat:@"%@:%@: %@\n",
+		[logString appendFormat:@"%@: %@\n",
 			projectLog.projectName,
-			[[self intervalStrings:projectLog.intervals] componentsJoinedByString:@", "],
 			[AppDelegate durationString:projectLog.totalTime]
 		];
 		
 		for (TTTaskLog * taskLog in projectLog.taskLogs.allValues)
 		{
-			[logString appendFormat:@"- %@:%@: %@\n",
+			[logString appendFormat:@"- %@: %@\n",
 				taskLog.taskName,
-				[[self intervalStrings:taskLog.intervals] componentsJoinedByString:@", "],
 				[AppDelegate durationString:taskLog.totalTime]
 			];
 		}
@@ -430,6 +430,18 @@
 	TTLog * log = [self getLogSummaryForDay:now];
 	NSString * logString = [self logSummaryToJsonString:log];
 	[self runScript:inScriptPath withInput:logString];
+}
+
+- (void)copyTodaysLog:(NSMenuItem *)inMenuItem
+{
+	NSDate * now = [[NSDate date] dateByAddingTimeInterval:-24.0*60.0*60.0];
+	TTLog * log = [self getLogSummaryForDay:now];
+	NSString * logString = [self logSummaryToString:log date:now];
+	
+	NSLog(@"Log:\n%@", logString);
+
+	[[NSPasteboard generalPasteboard] declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
+	[[NSPasteboard generalPasteboard] setString:logString forType:NSStringPboardType];
 }
 
 - (NSString *)runScript:(NSString *)inScriptPath withInput:(NSString *)inInput
