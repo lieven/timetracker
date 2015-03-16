@@ -25,6 +25,15 @@
 	NSMutableArray * _intervals;
 }
 
+- (instancetype)init
+{
+	if ((self = [super init]))
+	{
+		_intervals = [NSMutableArray new];
+	}
+	return self;
+}
+
 - (void)beginInterval:(NSDate *)inStartTime
 {
 	_currentInterval = [TTInterval new];
@@ -36,10 +45,6 @@
 	if (_currentInterval)
 	{
 		_currentInterval.endTime = inEndTime;
-		if (_intervals == nil)
-		{
-			_intervals = [NSMutableArray new];
-		}
 		[_intervals addObject:_currentInterval];
 		_currentInterval = nil;
 	}

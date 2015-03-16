@@ -10,6 +10,24 @@
 #import "TTController.h"
 #import "TTLog.h"
 
+@interface NSArray (TTMap)
+- (NSArray *)tt_map:(id (^)(id inItem))inTransformation;
+@end // NSArray (TTMap)
+
+@implementation NSArray (TTMap)
+
+- (NSArray *)tt_map:(id (^)(id inItem))inTransformation
+{
+	NSMutableArray * results = [NSMutableArray new];
+	for (id item in self)
+	{
+		[results addObject:inTransformation(item)];
+	}
+	return results;
+}
+
+@end // NSArray (TTMap)
+
 
 @interface AppDelegate ()< NSMenuDelegate >
 
@@ -354,19 +372,11 @@
 	{
 		return [NSString stringWithFormat:@"%.0fs", seconds];
 	}
-	
 }
 
-- (void)copyTodaysLog:(NSMenuItem *)inSender
+- (TTLog *)getLogSummaryForDay:(NSDate *)inDay
 {
-	NSMutableString * logString = [NSMutableString new];
-	
-	NSDate * now = [NSDate date];
-	
-	[logString appendString:[NSDateFormatter localizedStringFromDate:now dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterNoStyle]];
-	[logString appendString:@"\n\n"];
-	
-	NSArray * events = [[TTController controller] getEventsOnDay:now];
+	NSArray * events = [[TTController controller] getEventsOnDay:inDay];
 	
 	TTLog * log = [TTLog new];
 	for (TTEvent * event in events)
@@ -374,7 +384,18 @@
 		[log addEvent:event];
 	}
 	
-	for (TTProjectLog * projectLog in log.projectLogs.allValues)
+	return log;
+}
+
+- (NSString *)logSummaryToString:(TTLog *)inLog date:(NSDate *)inDate
+{
+	NSMutableString * logString = [NSMutableString new];
+	
+	[logString appendString:[NSDateFormatter localizedStringFromDate:inDate dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterNoStyle]];
+	[logString appendString:@"\n\n"];
+	
+	
+	for (TTProjectLog * projectLog in inLog.projectLogs.allValues)
 	{
 		[logString appendFormat:@"%@:%@: %@\n",
 			projectLog.projectName,
@@ -394,8 +415,59 @@
 		[logString appendString:@"\n"];
 	}
 	
-	NSLog(@"Log:\n%@", logString);
+	return logString;
+}
+
+- (NSDictionary *)intervalToDictionary:(TTInterval *)inInterval
+{
+	return @{
+		@"start": @([inInterval.startTime timeIntervalSince1970]),
+		@"end": @([inInterval.endTime timeIntervalSince1970])
+	};
+}
+
+- (NSDictionary *)projectLogToDictionary:(TTProjectLog *)inProjectLog
+{
+	return @{
+		@"project": inProjectLog.projectName ?: [NSNull null],
+		@"intervals": [inProjectLog.intervals tt_map:^id(TTInterval * inInterval) {
+			return [self intervalToDictionary:inInterval];
+		}],
+		@"duration": @(inProjectLog.totalTime),
+		@"tasks": [inProjectLog.taskLogs.allValues tt_map:^id(TTTaskLog * inTaskLog) {
+			return @{
+				@"name": inTaskLog.taskName ?: [NSNull null],
+				@"intervals": [inTaskLog.intervals tt_map:^id(TTInterval * inInterval) {
+					return [self intervalToDictionary:inInterval];
+				}],
+				@"duration": @(inTaskLog.totalTime)
+			};
+		}],
+	};
+}
+
+- (NSString *)logSummaryToJsonString:(TTLog *)inLog
+{
+	NSArray * projectLogDicts = [inLog.projectLogs.allValues tt_map:^id(TTProjectLog * inProjectLog) {
+		return [self projectLogToDictionary:inProjectLog];
+	}];
 	
+	NSError * error = nil;
+	NSData * jsonData = [NSJSONSerialization dataWithJSONObject:projectLogDicts options:NSJSONWritingPrettyPrinted error:&error];
+	return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+}
+
+- (void)copyTodaysLog:(NSMenuItem *)inSender
+{
+	NSDate * now = [NSDate date];
+	TTLog * log = [self getLogSummaryForDay:now];
+
+#if 0
+	NSString * logString = [self logSummaryToString:log date:now];
+#else
+	NSString * logString = [self logSummaryToJsonString:log];
+#endif
+
 	[[NSPasteboard generalPasteboard] declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
 	[[NSPasteboard generalPasteboard] setString:logString forType:NSStringPboardType];
 }
