@@ -13,7 +13,7 @@
 
 @interface TTDatabase : NSObject
 
-- (instancetype)init;
+- (instancetype)initWithPath:(NSString *)inPath;
 
 - (NSArray *)getProjects;
 
