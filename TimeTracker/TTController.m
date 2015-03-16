@@ -87,6 +87,27 @@ NSDate * TTStartOfDay(NSDate * inDate)
 	return sPath;
 }
 
++ (NSString *)scriptsFolder
+{
+	static NSString * sPath = nil;
+	static dispatch_once_t sOnceToken = 0;
+	dispatch_once(&sOnceToken, ^{
+		sPath = [[self dataFolder] stringByAppendingPathComponent:@"Scripts"];
+		NSFileManager * fm = [NSFileManager defaultManager];
+		if (! [fm fileExistsAtPath:sPath])
+		{
+			NSString * defaultScripts = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"DefaultScripts"];
+			
+			NSError * error = nil;
+			if (! [fm copyItemAtPath:defaultScripts toPath:sPath error:&error])
+			{
+				NSLog(@"Could not copy default scripts");
+			}
+		}
+	});
+	return sPath;
+}
+
 + (NSString *)databasePath
 {
 	static NSString * sPath = nil;

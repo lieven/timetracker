@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "TTController.h"
 #import "TTLog+Serialisation.h"
+#import "TTScriptsMenu.h"
 
 
 
@@ -30,6 +31,8 @@
 @property (nonatomic, weak) NSMenuItem * currentProjectMenuItem;
 @property (nonatomic, weak) NSMenuItem * currentTaskMenuItem;
 
+@property (nonatomic, strong) TTScriptsMenu * scriptsMenu;
+
 @end // AppDelegate ()
 
 
@@ -43,6 +46,16 @@
 	
 	self.menu = [[NSMenu alloc] initWithTitle:@""];
 	self.menu.delegate = self;
+	
+	__weak typeof(self) weakSelf = self;
+	
+	self.scriptsMenu = [[TTScriptsMenu alloc] initWithFolder:[TTController scriptsFolder]];
+	self.scriptsMenu.onRunScript = ^(NSString * inScriptPath)
+	{
+		[weakSelf runScriptWithTodaysLog:inScriptPath];
+	};
+	
+	
 	[self reloadMenu];
 	
 	self.statusItem.menu = self.menu;
@@ -178,7 +191,8 @@
 	
 	[self updateTime];
 	
-	[self.menu addItemWithTitle:@"Copy Today's Log" action:@selector(copyTodaysLog:) keyEquivalent:@""];
+	NSMenuItem * todaysLogMenuItem = [self.menu addItemWithTitle:@"Today's Log" action:nil keyEquivalent:@""];
+	todaysLogMenuItem.submenu = self.scriptsMenu;
 	
 	[self.menu addItemWithTitle:@"Quit" action:@selector(terminate:) keyEquivalent:@"q"];
 	
@@ -410,19 +424,36 @@
 	return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
-- (void)copyTodaysLog:(NSMenuItem *)inSender
+- (void)runScriptWithTodaysLog:(NSString *)inScriptPath
 {
 	NSDate * now = [NSDate date];
 	TTLog * log = [self getLogSummaryForDay:now];
-
-#if 0
-	NSString * logString = [self logSummaryToString:log date:now];
-#else
 	NSString * logString = [self logSummaryToJsonString:log];
-#endif
+	[self runScript:inScriptPath withInput:logString];
+}
 
-	[[NSPasteboard generalPasteboard] declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
-	[[NSPasteboard generalPasteboard] setString:logString forType:NSStringPboardType];
+- (NSString *)runScript:(NSString *)inScriptPath withInput:(NSString *)inInput
+{
+	NSTask *task = [[NSTask alloc] init];
+	task.launchPath = @"/bin/sh";
+	task.arguments = @[ inScriptPath ];
+
+	NSPipe *readPipe = [NSPipe pipe];
+	NSFileHandle *readHandle = [readPipe fileHandleForReading];
+
+	NSPipe *writePipe = [NSPipe pipe];
+	NSFileHandle *writeHandle = [writePipe fileHandleForWriting];
+
+	[task setStandardInput: writePipe];
+	[task setStandardOutput: readPipe];
+
+	[task launch];
+
+	[writeHandle writeData: [inInput dataUsingEncoding: NSUTF8StringEncoding]];
+	[writeHandle closeFile];
+
+	NSData * output = [readHandle readDataToEndOfFile];
+	return [[NSString alloc] initWithData:output encoding:NSUTF8StringEncoding];
 }
 
 - (void)showInputAlert:(NSString *)inMessage confirmButton:(NSString *)inConfirmButton completion:(void (^)(NSString * inInputText))inCompletionBlock
