@@ -29,6 +29,9 @@
 @property (nonatomic, weak) NSMenuItem * currentProjectMenuItem;
 @property (nonatomic, weak) NSMenuItem * currentTaskMenuItem;
 
+@property (nonatomic, strong) NSArray * projectMenuItems;
+@property (nonatomic, strong) NSArray * taskMenuItems;
+
 @end // AppDelegate ()
 
 
@@ -36,6 +39,8 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)inNotification
 {
+	[[TTController controller] setCurrentProject:nil task:nil];
+	
 	self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
 	self.statusItem.image = [NSImage imageNamed:@"timer"];
 	self.statusItem.highlightMode = YES;
@@ -52,7 +57,7 @@
 	[[TTController controller] setCurrentProject:nil task:nil];
 }
 
-- (void)addItems:(NSArray *)inItems toMenu:(NSMenu *)inMenu action:(SEL)inAction overflow:(NSString *)inOverflowTitle titleKey:(NSString *)inTitleKey update:(void (^)(id inItem, NSMenuItem * inMenuItem))inUpdateBlock
+- (NSArray *)addItems:(NSArray *)inItems toMenu:(NSMenu *)inMenu action:(SEL)inAction overflow:(NSString *)inOverflowTitle titleKey:(NSString *)inTitleKey update:(void (^)(id inItem, NSMenuItem * inMenuItem))inUpdateBlock
 {
 	NSInteger tag = 0;
 	NSInteger maxItems = 5;
@@ -64,12 +69,16 @@
 	
 	NSMenu * menu = inMenu;
 	
+	NSMutableArray * menuItems = [NSMutableArray new];;
+	
 	for (id item in inItems)
 	{
 		NSString * title = [item valueForKey:inTitleKey];
 		
 		NSMenuItem * menuItem = [menu addItemWithTitle:title action:inAction keyEquivalent:@""];
 		menuItem.tag = tag++;
+		
+		[menuItems addObject:menuItem];
 		
 		inUpdateBlock(item, menuItem);
 		
@@ -82,6 +91,8 @@
 			inUpdateBlock(nil, overflowMenuItem);
 		}
 	}
+	
+	return menuItems;
 }
 
 + (NSAttributedString *)attributedTitle:(NSString *)inTitle time:(NSTimeInterval)inTimeInterval
@@ -113,7 +124,7 @@
 		[NSSortDescriptor sortDescriptorWithKey:@"self.name" ascending:YES]
 	]];
 	
-	[self addItems:self.projects toMenu:self.projectsSubmenu action:@selector(selectProject:) overflow:@"Older Projects" titleKey:@"name"
+	self.projectMenuItems = [self addItems:self.projects toMenu:self.projectsSubmenu action:@selector(selectProject:) overflow:@"Older Projects" titleKey:@"name"
 		update:^(TTProject * inProject, NSMenuItem * inMenuItem)
 		{
 			if (weakSelf.currentProject == nil && [controller.currentProjectID isEqualTo:inProject.identifier])
@@ -153,7 +164,7 @@
 		NSMenu * menu = self.menu;
 		
 		
-		[self addItems:self.tasks toMenu:menu action:@selector(selectTask:) overflow:@"Older Tasks" titleKey:@"name"
+		self.taskMenuItems = [self addItems:self.tasks toMenu:menu action:@selector(selectTask:) overflow:@"Older Tasks" titleKey:@"name"
 			update:^(TTTask * inTask, NSMenuItem * inMenuItem)
 			{
 				if (weakSelf.currentTask == nil && [controller.currentTaskID isEqualTo:inTask.identifier])
@@ -173,11 +184,12 @@
 	else
 	{
 		self.tasks = nil;
+		self.taskMenuItems = nil;
 	}
 	
 	[self updateTime];
 	
-	[self.menu addItemWithTitle:@"Copy Today's Log" action:@selector(copyTodaysLog:) keyEquivalent:@""];
+	[self.menu addItemWithTitle:@"Copy Today's Log" action:@selector(copyTodaysLog:) keyEquivalent:@"c"];
 	
 	[self.menu addItemWithTitle:@"Quit" action:@selector(terminate:) keyEquivalent:@"q"];
 	
@@ -214,9 +226,17 @@
 	}
 }
 
-- (void)menuWillOpen:(NSMenu *)inMenu
+- (void)menuNeedsUpdate:(NSMenu *)menu
 {
 	[self updateTime];
+	
+	NSLog(@"Menu needs update");
+	
+	if ([NSEvent modifierFlags] & NSAlternateKeyMask)
+	{
+		NSLog(@"Option key");
+	}
+
 }
 
 - (NSString *)truncateString:(NSString *)inString to:(NSUInteger)inMaxLength
