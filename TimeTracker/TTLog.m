@@ -36,8 +36,11 @@
 
 - (void)beginInterval:(NSDate *)inStartTime
 {
-	_currentInterval = [TTInterval new];
-	_currentInterval.startTime = inStartTime;
+	if (_currentInterval == nil)
+	{
+		_currentInterval = [TTInterval new];
+		_currentInterval.startTime = inStartTime;
+	}
 }
 
 - (void)endInterval:(NSDate *)inEndTime
@@ -151,6 +154,7 @@
 	
 	if ([inEvent.projectID isEqual:self.projectID])
 	{
+		[self beginInterval:inEvent.time];
 		return YES;
 	}
 	else
