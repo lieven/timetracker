@@ -193,11 +193,14 @@
 	[self.menu addItemWithTitle:@"Export JSON" action:nil keyEquivalent:@""].submenu = self.scriptsMenu;
 	[self.menu addItemWithTitle:@"Copy Summary" action:@selector(copyTodaysLog:) keyEquivalent:@"c"];
 	[self.menu addItem:[NSMenuItem separatorItem]];
+<<<<<<< HEAD
 	
 	if (self.currentProject)
 	{
 		[self.menu addItemWithTitle:@"Stop Tracking" action:@selector(stopTracking:) keyEquivalent:@""];
 	}
+=======
+>>>>>>> af5505098396eced4acc44db546508515ff1aedd
 	
 	[self.menu addItemWithTitle:@"Quit" action:@selector(terminate:) keyEquivalent:@"q"];
 	
