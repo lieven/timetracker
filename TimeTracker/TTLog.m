@@ -144,15 +144,13 @@
 		}
 	}
 	
-	[self endInterval:inEvent.time];
-	
 	if ([inEvent.projectID isEqual:self.projectID])
 	{
-		[self beginInterval:inEvent.time];
 		return YES;
 	}
 	else
 	{
+		[self endInterval:inEvent.time];
 		return NO;
 	}
 }
