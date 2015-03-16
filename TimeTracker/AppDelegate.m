@@ -287,7 +287,7 @@
 	NSMutableArray * strings = [NSMutableArray new];
 	for (TTInterval * interval in inIntervals)
 	{
-		[strings addObject:[NSString stringWithFormat:@" %@-%@",
+		[strings addObject:[NSString stringWithFormat:@" %@ - %@",
 			[NSDateFormatter localizedStringFromDate:interval.startTime dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle],
 			[NSDateFormatter localizedStringFromDate:interval.endTime dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle]
 		]];
@@ -307,11 +307,11 @@
 	
 	if (hours > 0.0)
 	{
-		return [NSString stringWithFormat:@"%.0fh%.0fm%.0fs", hours, minutes, seconds];
+		return [NSString stringWithFormat:@"%.0fh %.0fm", hours, minutes + round(seconds/60.0)];
 	}
 	else if (minutes > 0.0)
 	{
-		return [NSString stringWithFormat:@"%.0fm%.0fs", minutes, seconds];
+		return [NSString stringWithFormat:@"%.0fm", minutes + round(seconds/60.0)];
 	}
 	else
 	{
@@ -339,7 +339,7 @@
 	
 	for (TTProjectLog * projectLog in log.projectLogs.allValues)
 	{
-		[logString appendFormat:@"%@: %@: %@\n",
+		[logString appendFormat:@"%@:%@: %@\n",
 			projectLog.projectName,
 			[[self intervalStrings:projectLog.intervals] componentsJoinedByString:@", "],
 			[self durationString:projectLog.totalTime]
@@ -347,7 +347,7 @@
 		
 		for (TTTaskLog * taskLog in projectLog.taskLogs.allValues)
 		{
-			[logString appendFormat:@"- %@: %@: %@\n",
+			[logString appendFormat:@"- %@:%@: %@\n",
 				taskLog.taskName,
 				[[self intervalStrings:taskLog.intervals] componentsJoinedByString:@", "],
 				[self durationString:taskLog.totalTime]
