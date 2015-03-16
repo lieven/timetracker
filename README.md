@@ -25,3 +25,38 @@ Using _Copy Today's Log_, you can copy a textual overview to the clipboard of ho
 	Showpad iOS:  12:00-12:15: 15m
 	- SPI-907:  12:00-12:10: 10m
 	- SPI-877:  12:10-12:15: 5m
+
+## Planned Improvements
+
+### Manually enter start time
+
+When you forgot to turn on tracking or switch to a new task, you should be able to do it later on. Holding the option key while selecting a project or task will give you a dialog where you can modify the start time.
+
+### Export to different formats
+
+First, the default format will be changed to something more structured:
+
+	[
+		{
+			"project": "online platform",
+			"tasks": [
+				{
+					"name": "SP-295",
+					"duration": 15.22,
+					"intervals": [
+						{ "start": "2015-03-22 00:00:00", "end": "2015-03-22 00:01:00" },
+						... N intervals
+					]
+				},
+				... N tasks
+			],
+			"duration": 15.22,
+			"intervals": [
+				{ "start": "2015-03-22 00:00:00", "end": "2015-03-22 00:01:00" },
+				... N intervals
+			]
+		},
+		... N projects
+	]
+
+After that, users will be able to add scripts to a predefined folder that can transform this output or even integrate with JIRA etc.
