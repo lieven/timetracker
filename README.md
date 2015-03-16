@@ -60,3 +60,7 @@ First, the default format will be changed to something more structured:
 	]
 
 After that, users will be able to add scripts to a predefined folder that can transform this output or even integrate with JIRA etc.
+
+### Time Tracking Overview
+
+To verify things are correct, a visual preview of your current day will be created, allowing edits, normalisation and exports.
