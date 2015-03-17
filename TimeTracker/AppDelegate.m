@@ -620,6 +620,8 @@
 	
 	NSString * resultText = nil;
 	
+	[[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+	
 	NSInteger button = [alert runModal];
 	switch (button)
 	{
@@ -654,10 +656,14 @@
 	[self showInputAlert:inMessage defaultText:nowString confirmButton:@"OK"
 		completion:^(NSString * inInputText)
 		{
-			NSDate * timestamp = [dateFormatter dateFromString:inInputText];
-			if (! timestamp)
+			NSDate * timestamp = nil;
+			if (inInputText)
 			{
-				NSLog(@"Could not parse %@", inInputText);
+				timestamp = [dateFormatter dateFromString:inInputText];
+				if (! timestamp)
+				{
+					NSLog(@"Could not parse %@", inInputText);
+				}
 			}
 			inCompletionBlock(timestamp);
 		}
