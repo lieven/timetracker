@@ -11,11 +11,23 @@
 
 @implementation TTInterval (Serialisation)
 
++ (NSDateFormatter *)dateFormatter
+{
+	static NSDateFormatter * sDateFormatter = nil;
+	static dispatch_once_t sOnceToken = 0;
+	dispatch_once(&sOnceToken, ^{
+		sDateFormatter = [NSDateFormatter new];
+		sDateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss";
+	});
+	return sDateFormatter;
+}
+
 - (NSDictionary *)toDictionary
 {
+	NSDateFormatter * dateFormatter = [self.class dateFormatter];
 	return @{
-		@"start": @([self.startTime timeIntervalSince1970]),
-		@"end": @([self.endTime timeIntervalSince1970])
+		@"start": self.startTime ? [dateFormatter stringFromDate:self.startTime] : [NSNull null],
+		@"end": self.endTime ? [dateFormatter stringFromDate:self.endTime] : [NSNull null]
 	};
 }
 
