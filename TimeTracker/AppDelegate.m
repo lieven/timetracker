@@ -33,6 +33,8 @@
 
 @property (nonatomic, strong) NSArray * projectMenuItems;
 @property (nonatomic, strong) NSArray * taskMenuItems;
+@property (nonatomic, assign) BOOL optionKeyDown;
+@property (nonatomic, strong) NSTimer * optionKeyTimer;
 
 @property (nonatomic, strong) TTScriptsMenu * scriptsMenu;
 
@@ -145,6 +147,11 @@
 			{
 				weakSelf.currentProject = inProject;
 				inMenuItem.state = NSOnState;
+				inMenuItem.action = nil;
+			}
+			else if (weakSelf.optionKeyDown)
+			{
+				inMenuItem.title = [inMenuItem.title stringByAppendingString:@"..."];
 			}
 		}
 	];
@@ -246,17 +253,76 @@
 	}
 }
 
+- (void)updateMenuItemSuffixes
+{
+	[self updateMenuItemSuffixes:self.projectMenuItems];
+	[self updateMenuItemSuffixes:self.taskMenuItems];
+}
+
+- (void)updateMenuItemSuffixes:(NSArray *)inMenuItems
+{
+	NSString * suffix = @"...";
+	for (NSMenuItem * menuItem in inMenuItems)
+	{
+		if (menuItem != self.currentProjectMenuItem && menuItem != self.currentTaskMenuItem)
+		{
+			NSString * title = menuItem.title;
+			if (_optionKeyDown)
+			{
+				if (![title hasSuffix:suffix])
+				{
+					menuItem.title = [title stringByAppendingString:suffix];
+				}
+			}
+			else
+			{
+				if ([title hasSuffix:suffix])
+				{
+					menuItem.title = [title substringToIndex:title.length - suffix.length];
+				}
+			}
+		}
+	}
+}
+
 - (void)menuNeedsUpdate:(NSMenu *)menu
 {
 	[self updateTime];
-	
-	NSLog(@"Menu needs update");
-	
+}
+
+
+- (void)updateOptionKey:(NSTimer *)inTimer
+{
 	if ([NSEvent modifierFlags] & NSAlternateKeyMask)
 	{
-		NSLog(@"Option key");
+		self.optionKeyDown = YES;
 	}
+	else
+	{
+		self.optionKeyDown = NO;
+	}
+}
 
+- (void)menuWillOpen:(NSMenu *)menu
+{
+	self.optionKeyTimer = [NSTimer timerWithTimeInterval:0.1 target:self selector:@selector(updateOptionKey:) userInfo:nil repeats:YES];
+	[[NSRunLoop currentRunLoop] addTimer:self.optionKeyTimer forMode:NSEventTrackingRunLoopMode];
+}
+
+- (void)menuDidClose:(NSMenu *)menu
+{
+	[self.optionKeyTimer invalidate];
+	self.optionKeyTimer = nil;
+}
+
+- (void)setOptionKeyDown:(BOOL)inKeyIsDown
+{
+	if (inKeyIsDown != _optionKeyDown)
+	{
+		_optionKeyDown = inKeyIsDown;
+		
+		[self updateMenuItemSuffixes];
+	}
 }
 
 - (NSString *)truncateString:(NSString *)inString to:(NSUInteger)inMaxLength
@@ -282,22 +348,48 @@
 	TTProject * project = [self projectAtIndex:inSender.tag];
 	if (project)
 	{
-		TTController * controller = [TTController controller];
-		
-		project.lastUse = [NSDate date];
-		[controller saveProject:project];
-		
-		[controller setCurrentProject:project.identifier task:nil];
-		
-		[self reloadMenu];
+		if (self.optionKeyDown)
+		{
+			__weak typeof(self) weakSelf = self;
+			NSString * message = [NSString stringWithFormat:@"Enter the time you started working on %@", project.name];
+			[self showTimestampInputAlert:message defaultTime:[NSDate date] confirmButton:@"OK"
+				completion:^(NSDate *inTimestamp)
+				{
+					if (inTimestamp)
+					{
+						[weakSelf selectProject:project time:inTimestamp];
+					}
+					else
+					{
+						NSBeep();
+					}
+				}
+			];
+		}
+		else
+		{
+			[self selectProject:project time:[NSDate date]];
+		}
 	}
+}
+
+- (void)selectProject:(TTProject *)inProject time:(NSDate *)inTimestamp
+{
+	TTController * controller = [TTController controller];
+	
+	inProject.lastUse = inTimestamp;
+	[controller saveProject:inProject];
+	
+	[controller setCurrentProject:inProject.identifier task:nil time:inTimestamp];
+	
+	[self reloadMenu];
 }
 
 - (void)addProject:(NSMenuItem *)inSender
 {
 	__weak typeof(self) weakSelf = self;
 	
-	[self showInputAlert:@"Add Project" confirmButton:@"Add"
+	[self showInputAlert:@"Add Project" defaultText:@"" confirmButton:@"Add"
 		completion:^(NSString *inInputText)
 		{
 			if (inInputText)
@@ -321,7 +413,7 @@
 {
 	__weak typeof(self) weakSelf = self;
 	
-	[self showInputAlert:@"Add Task" confirmButton:@"Add"
+	[self showInputAlert:@"Add Task" defaultText:@"" confirmButton:@"Add"
 		completion:^(NSString *inInputText)
 		{
 			[[TTController controller] addTaskWithName:inInputText];
@@ -344,13 +436,39 @@
 	TTTask * task = [self taskAtIndex:inSender.tag];
 	if (task)
 	{
-		TTController * controller = [TTController controller];
-		task.lastUse = [NSDate date];
-		[controller saveTask:task];
-		
-		[controller setCurrentProject:controller.currentProjectID task:task.identifier];
-		[self reloadMenu];
+		if (self.optionKeyDown)
+		{
+			__weak typeof(self) weakSelf = self;
+			NSString * message = [NSString stringWithFormat:@"Enter the time you started working on %@", task.name];
+			[self showTimestampInputAlert:message defaultTime:[NSDate date] confirmButton:@"OK"
+				completion:^(NSDate *inTimestamp)
+				{
+					if (inTimestamp)
+					{
+						[weakSelf selectTask:task time:inTimestamp];
+					}
+					else
+					{
+						NSBeep();
+					}
+				}
+			];
+		}
+		else
+		{
+			[self selectTask:task time:[NSDate date]];
+		}
 	}
+}
+
+- (void)selectTask:(TTTask *)inTask time:(NSDate *)inTimestamp
+{
+	TTController * controller = [TTController controller];
+	inTask.lastUse = inTimestamp;
+	[controller saveTask:inTask];
+	
+	[controller setCurrentProject:controller.currentProjectID task:inTask.identifier time:inTimestamp];
+	[self reloadMenu];
 }
 
 - (void)stopTracking:(NSMenuItem *)inSender
@@ -491,12 +609,13 @@
 	return [[NSString alloc] initWithData:output encoding:NSUTF8StringEncoding];
 }
 
-- (void)showInputAlert:(NSString *)inMessage confirmButton:(NSString *)inConfirmButton completion:(void (^)(NSString * inInputText))inCompletionBlock
+- (void)showInputAlert:(NSString *)inMessage defaultText:(NSString *)inDefaultText confirmButton:(NSString *)inConfirmButton completion:(void (^)(NSString * inInputText))inCompletionBlock
 {
 	NSAlert * alert = [NSAlert alertWithMessageText:inMessage defaultButton:inConfirmButton alternateButton:@"Cancel" otherButton:nil informativeTextWithFormat:@""];
 	
 	NSTextField * textField = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 300.0, 24.0)];
 	textField.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+	textField.stringValue = inDefaultText;
 	alert.accessoryView = textField;
 	
 	NSString * resultText = nil;
@@ -521,6 +640,28 @@
 	{
 		inCompletionBlock(resultText);
 	}
+}
+
+- (void)showTimestampInputAlert:(NSString *)inMessage defaultTime:(NSDate *)inDefaultTime confirmButton:(NSString *)inConfirmButton completion:(void (^)(NSDate * inTimestamp))inCompletionBlock
+{
+	NSDateFormatter * dateFormatter = [NSDateFormatter new];
+	dateFormatter.dateStyle = NSDateFormatterShortStyle;
+	dateFormatter.timeStyle = NSDateFormatterShortStyle;
+	
+	NSDate * now = [NSDate date];
+	NSString * nowString = [dateFormatter stringFromDate:now];
+	
+	[self showInputAlert:inMessage defaultText:nowString confirmButton:@"OK"
+		completion:^(NSString * inInputText)
+		{
+			NSDate * timestamp = [dateFormatter dateFromString:inInputText];
+			if (! timestamp)
+			{
+				NSLog(@"Could not parse %@", inInputText);
+			}
+			inCompletionBlock(timestamp);
+		}
+	];
 }
 
 @end // AppDelegate

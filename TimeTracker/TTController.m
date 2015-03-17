@@ -218,7 +218,7 @@ NSDate * TTStartOfDay(NSDate * inDate)
 	self.currentProjectID = inProjectID;
 	self.currentTaskID = inTaskID;
 	
-	[self.database addEvent:[NSDate date] project:inProjectID task:inTaskID];
+	[self.database addEvent:inTime project:inProjectID task:inTaskID];
 }
 
 - (NSArray *)getEventsOnDay:(NSDate *)inTimestamp
