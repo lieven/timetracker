@@ -18,23 +18,19 @@ First you need to add one or more projects and tasks. Selecting a project and/or
 
 Time is tracked for projects and tasks separately, but selecting a different project will stop tracking for the current task in the previous project.
 
-Using _Copy Today's Log_, you can copy a textual overview to the clipboard of how long you've worked on each project and its subtasks. Example output looks like this:
+When you forgot to switch projects or tasks, you can do so later on by holding down the option key. This will prompt you to enter the time.
+
+## Output
+
+Using _Copy Summary_, you can copy a textual overview to the clipboard of how long you've worked on each project and its subtasks. Example output looks like this:
 
 	14/03/15
 
-	Showpad iOS:  12:00-12:15: 15m
-	- SPI-907:  12:00-12:10: 10m
-	- SPI-877:  12:10-12:15: 5m
+	Showpad iOS: 15m
+	- SPI-907: 10m
+	- SPI-877: 5m
 
-## Planned Improvements
-
-### Manually enter start time
-
-When you forgot to turn on tracking or switch to a new task, you should be able to do it later on. Holding the option key while selecting a project or task will give you a dialog where you can modify the start time.
-
-### Export to different formats
-
-First, the default format will be changed to something more structured:
+Using _Export JSON_, you can send JSON output to any script you'd like. An example _Copy to Clipboard.sh_ script is provided, but you can add more in the Scripts folder.
 
 	[
 		{
@@ -59,7 +55,10 @@ First, the default format will be changed to something more structured:
 		... N projects
 	]
 
-After that, users will be able to add scripts to a predefined folder that can transform this output or even integrate with JIRA etc.
+
+
+
+## Planned Improvements
 
 ### Time Tracking Overview
 
