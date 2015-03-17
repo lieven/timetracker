@@ -16,6 +16,8 @@ BOOL TTEqualOrBothNil(id inObject1, id inObject2);
 
 + (TTController *)controller;
 
++ (NSString *)scriptsFolder;
+
 @property (nonatomic, readonly, copy) NSString * currentProjectID;
 @property (nonatomic, readonly, copy) NSString * currentTaskID;
 

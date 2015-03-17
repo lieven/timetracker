@@ -58,11 +58,95 @@ NSDate * TTStartOfDay(NSDate * inDate)
 	return sSharedInstance;
 }
 
++ (NSString *)applicationSupportDirectory
+{
+	static NSString * sPath = nil;
+	static dispatch_once_t sOnceToken = 0;
+	dispatch_once(&sOnceToken, ^{
+		sPath = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES).firstObject;
+	});
+	return sPath;
+}
+
++ (NSString *)dataFolder
+{
+	static NSString * sPath = nil;
+	static dispatch_once_t sOnceToken = 0;
+	dispatch_once(&sOnceToken, ^{
+		sPath = [[self applicationSupportDirectory] stringByAppendingPathComponent:[NSBundle mainBundle].bundleIdentifier];
+		NSFileManager *fm = [NSFileManager defaultManager];
+		if (! [fm fileExistsAtPath:sPath])
+		{
+			NSError * error = nil;
+			if (! [fm createDirectoryAtPath:sPath withIntermediateDirectories:YES attributes:nil error:&error])
+			{
+				NSLog(@"Could not create data folder: %@", sPath);
+			}
+		}
+	});
+	return sPath;
+}
+
++ (NSString *)scriptsFolder
+{
+	static NSString * sPath = nil;
+	static dispatch_once_t sOnceToken = 0;
+	dispatch_once(&sOnceToken, ^{
+		sPath = [[self dataFolder] stringByAppendingPathComponent:@"Scripts"];
+		NSFileManager * fm = [NSFileManager defaultManager];
+		if (! [fm fileExistsAtPath:sPath])
+		{
+			NSString * defaultScripts = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"DefaultScripts"];
+			
+			NSError * error = nil;
+			if (! [fm copyItemAtPath:defaultScripts toPath:sPath error:&error])
+			{
+				NSLog(@"Could not copy default scripts");
+			}
+		}
+	});
+	return sPath;
+}
+
++ (NSString *)databasePath
+{
+	static NSString * sPath = nil;
+	static dispatch_once_t sOnceToken = 0;
+	dispatch_once(&sOnceToken, ^{
+		sPath = [[self dataFolder] stringByAppendingPathComponent:@"TimeTracker.sqlite"];
+	});
+	return sPath;
+}
+
++ (void)migrate
+{
+	static dispatch_once_t sOnceToken = 0;
+	dispatch_once(&sOnceToken, ^{
+	
+		NSString * newPath = [self databasePath];
+		NSFileManager * fm = [NSFileManager defaultManager];
+		if (! [fm fileExistsAtPath:newPath])
+		{
+			NSString * oldPath = [[self applicationSupportDirectory] stringByAppendingPathComponent:@"TimeTracker.sqlite"];
+			if ([fm fileExistsAtPath:oldPath])
+			{
+				NSError * error = nil;
+				if (! [fm moveItemAtPath:oldPath toPath:newPath error:&error])
+				{
+					NSLog(@"Could not move database from %@ to %@", oldPath, newPath);
+				}
+			}
+		}
+	});
+}
+
 - (instancetype)init
 {
 	if ((self = [super init]))
 	{
-		self.database = [TTDatabase new];
+		[self.class migrate];
+		
+		self.database = [[TTDatabase alloc] initWithPath:[self.class databasePath]];
 	}
 	return self;
 }

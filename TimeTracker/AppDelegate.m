@@ -8,7 +8,9 @@
 
 #import "AppDelegate.h"
 #import "TTController.h"
-#import "TTLog.h"
+#import "TTLog+Serialisation.h"
+#import "TTScriptsMenu.h"
+
 
 
 @interface AppDelegate ()< NSMenuDelegate >
@@ -32,6 +34,8 @@
 @property (nonatomic, strong) NSArray * projectMenuItems;
 @property (nonatomic, strong) NSArray * taskMenuItems;
 
+@property (nonatomic, strong) TTScriptsMenu * scriptsMenu;
+
 @end // AppDelegate ()
 
 
@@ -47,6 +51,16 @@
 	
 	self.menu = [[NSMenu alloc] initWithTitle:@""];
 	self.menu.delegate = self;
+	
+	__weak typeof(self) weakSelf = self;
+	
+	self.scriptsMenu = [[TTScriptsMenu alloc] initWithFolder:[TTController scriptsFolder]];
+	self.scriptsMenu.onRunScript = ^(NSString * inScriptPath)
+	{
+		[weakSelf runScriptWithTodaysLog:inScriptPath];
+	};
+	
+	
 	[self reloadMenu];
 	
 	self.statusItem.menu = self.menu;
@@ -178,8 +192,6 @@
 		
 		[self.menu addItemWithTitle:@"Add Task..." action:@selector(addTask:) keyEquivalent:@""];
 		[self.menu addItem:[NSMenuItem separatorItem]];
-		
-		[self.menu addItemWithTitle:@"Stop Tracking" action:@selector(stopTracking:) keyEquivalent:@""];
 	}
 	else
 	{
@@ -189,7 +201,15 @@
 	
 	[self updateTime];
 	
-	[self.menu addItemWithTitle:@"Copy Today's Log" action:@selector(copyTodaysLog:) keyEquivalent:@"c"];
+	[self.menu addItemWithTitle:@"Today's Log" action:nil keyEquivalent:@""];
+	[self.menu addItemWithTitle:@"Export JSON" action:nil keyEquivalent:@""].submenu = self.scriptsMenu;
+	[self.menu addItemWithTitle:@"Copy Summary" action:@selector(copyTodaysLog:) keyEquivalent:@"c"];
+	[self.menu addItem:[NSMenuItem separatorItem]];
+	
+	if (self.currentProject)
+	{
+		[self.menu addItemWithTitle:@"Stop Tracking" action:@selector(stopTracking:) keyEquivalent:@""];
+	}
 	
 	[self.menu addItemWithTitle:@"Quit" action:@selector(terminate:) keyEquivalent:@"q"];
 	
@@ -374,19 +394,11 @@
 	{
 		return [NSString stringWithFormat:@"%.0fs", seconds];
 	}
-	
 }
 
-- (void)copyTodaysLog:(NSMenuItem *)inSender
+- (TTLog *)getLogSummaryForDay:(NSDate *)inDay
 {
-	NSMutableString * logString = [NSMutableString new];
-	
-	NSDate * now = [NSDate date];
-	
-	[logString appendString:[NSDateFormatter localizedStringFromDate:now dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterNoStyle]];
-	[logString appendString:@"\n\n"];
-	
-	NSArray * events = [[TTController controller] getEventsOnDay:now];
+	NSArray * events = [[TTController controller] getEventsOnDay:inDay];
 	
 	TTLog * log = [TTLog new];
 	for (TTEvent * event in events)
@@ -394,19 +406,28 @@
 		[log addEvent:event];
 	}
 	
-	for (TTProjectLog * projectLog in log.projectLogs.allValues)
+	return log;
+}
+
+- (NSString *)logSummaryToString:(TTLog *)inLog date:(NSDate *)inDate
+{
+	NSMutableString * logString = [NSMutableString new];
+	
+	[logString appendString:[NSDateFormatter localizedStringFromDate:inDate dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterNoStyle]];
+	[logString appendString:@"\n\n"];
+	
+	
+	for (TTProjectLog * projectLog in inLog.projectLogs.allValues)
 	{
-		[logString appendFormat:@"%@:%@: %@\n",
+		[logString appendFormat:@"%@: %@\n",
 			projectLog.projectName,
-			[[self intervalStrings:projectLog.intervals] componentsJoinedByString:@", "],
 			[AppDelegate durationString:projectLog.totalTime]
 		];
 		
 		for (TTTaskLog * taskLog in projectLog.taskLogs.allValues)
 		{
-			[logString appendFormat:@"- %@:%@: %@\n",
+			[logString appendFormat:@"- %@: %@\n",
 				taskLog.taskName,
-				[[self intervalStrings:taskLog.intervals] componentsJoinedByString:@", "],
 				[AppDelegate durationString:taskLog.totalTime]
 			];
 		}
@@ -414,10 +435,60 @@
 		[logString appendString:@"\n"];
 	}
 	
-	NSLog(@"Log:\n%@", logString);
+	return logString;
+}
+
+- (NSString *)logSummaryToJsonString:(TTLog *)inLog
+{
+	NSArray * projectLogDicts = [inLog toDictionaries];
 	
+	NSError * error = nil;
+	NSData * jsonData = [NSJSONSerialization dataWithJSONObject:projectLogDicts options:NSJSONWritingPrettyPrinted error:&error];
+	return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+}
+
+- (void)runScriptWithTodaysLog:(NSString *)inScriptPath
+{
+	NSDate * now = [NSDate date];
+	TTLog * log = [self getLogSummaryForDay:now];
+	NSString * logString = [self logSummaryToJsonString:log];
+	[self runScript:inScriptPath withInput:logString];
+}
+
+- (void)copyTodaysLog:(NSMenuItem *)inMenuItem
+{
+	NSDate * now = [NSDate date];
+	TTLog * log = [self getLogSummaryForDay:now];
+	NSString * logString = [self logSummaryToString:log date:now];
+	
+	NSLog(@"Log:\n%@", logString);
+
 	[[NSPasteboard generalPasteboard] declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
 	[[NSPasteboard generalPasteboard] setString:logString forType:NSStringPboardType];
+}
+
+- (NSString *)runScript:(NSString *)inScriptPath withInput:(NSString *)inInput
+{
+	NSTask *task = [[NSTask alloc] init];
+	task.launchPath = @"/bin/sh";
+	task.arguments = @[ inScriptPath ];
+
+	NSPipe *readPipe = [NSPipe pipe];
+	NSFileHandle *readHandle = [readPipe fileHandleForReading];
+
+	NSPipe *writePipe = [NSPipe pipe];
+	NSFileHandle *writeHandle = [writePipe fileHandleForWriting];
+
+	[task setStandardInput: writePipe];
+	[task setStandardOutput: readPipe];
+
+	[task launch];
+
+	[writeHandle writeData: [inInput dataUsingEncoding: NSUTF8StringEncoding]];
+	[writeHandle closeFile];
+
+	NSData * output = [readHandle readDataToEndOfFile];
+	return [[NSString alloc] initWithData:output encoding:NSUTF8StringEncoding];
 }
 
 - (void)showInputAlert:(NSString *)inMessage confirmButton:(NSString *)inConfirmButton completion:(void (^)(NSString * inInputText))inCompletionBlock

@@ -25,10 +25,22 @@
 	NSMutableArray * _intervals;
 }
 
+- (instancetype)init
+{
+	if ((self = [super init]))
+	{
+		_intervals = [NSMutableArray new];
+	}
+	return self;
+}
+
 - (void)beginInterval:(NSDate *)inStartTime
 {
-	_currentInterval = [TTInterval new];
-	_currentInterval.startTime = inStartTime;
+	if (_currentInterval == nil)
+	{
+		_currentInterval = [TTInterval new];
+		_currentInterval.startTime = inStartTime;
+	}
 }
 
 - (void)endInterval:(NSDate *)inEndTime
@@ -36,10 +48,6 @@
 	if (_currentInterval)
 	{
 		_currentInterval.endTime = inEndTime;
-		if (_intervals == nil)
-		{
-			_intervals = [NSMutableArray new];
-		}
 		[_intervals addObject:_currentInterval];
 		_currentInterval = nil;
 	}
@@ -146,6 +154,7 @@
 	
 	if ([inEvent.projectID isEqual:self.projectID])
 	{
+		[self beginInterval:inEvent.time];
 		return YES;
 	}
 	else

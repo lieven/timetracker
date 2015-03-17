@@ -17,31 +17,11 @@
 
 @implementation TTDatabase
 
-+ (NSString *)applicationSupportDirectory
-{
-	static NSString * sPath = nil;
-	static dispatch_once_t sOnceToken = 0;
-	dispatch_once(&sOnceToken, ^{
-		sPath = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES).firstObject;
-	});
-	return sPath;
-}
-
-+ (NSString *)databasePath
-{
-	static NSString * sPath = nil;
-	static dispatch_once_t sOnceToken = 0;
-	dispatch_once(&sOnceToken, ^{
-		sPath = [[self applicationSupportDirectory] stringByAppendingPathComponent:@"TimeTracker.sqlite"];
-	});
-	return sPath;
-}
-
-- (instancetype)init
+- (instancetype)initWithPath:(NSString *)inPath
 {
 	if ((self = [super init]))
 	{
-		self.queue = [[FMDatabaseQueue alloc] initWithPath:[self.class databasePath]];
+		self.queue = [[FMDatabaseQueue alloc] initWithPath:inPath];
 		if (! self.queue)
 		{
 			return nil;
