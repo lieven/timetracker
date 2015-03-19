@@ -47,8 +47,11 @@
 {
 	[[TTController controller] setCurrentProject:nil task:nil];
 	
+    NSImage *statusItemImage = [NSImage imageNamed:@"timer"];
+    [statusItemImage setTemplate:YES];
+    
 	self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
-	self.statusItem.image = [NSImage imageNamed:@"timer"];
+    self.statusItem.image = statusItemImage;
 	self.statusItem.highlightMode = YES;
 	
 	self.menu = [[NSMenu alloc] initWithTitle:@""];
