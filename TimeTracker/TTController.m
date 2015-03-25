@@ -221,11 +221,9 @@ NSDate * TTStartOfDay(NSDate * inDate)
 	[self.database addEvent:inTime project:inProjectID task:inTaskID];
 }
 
-- (NSArray *)getEventsOnDay:(NSDate *)inTimestamp
+- (NSArray *)getEventsFrom:(NSDate *)inStartTime to:(NSDate *)inEndTime
 {
-	NSDate * startOfDay = TTStartOfDay(inTimestamp);
-	NSDate * endOfDay = [startOfDay dateByAddingTimeInterval:24.0*60.0*60.0];
-	return [self.database getEventsFrom:startOfDay to:endOfDay];
+	return [self.database getEventsFrom:inStartTime to:inEndTime];
 }
 
 @end // TTController

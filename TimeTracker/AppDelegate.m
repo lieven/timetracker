@@ -33,6 +33,7 @@
 
 @property (nonatomic, strong) NSArray * projectMenuItems;
 @property (nonatomic, strong) NSArray * taskMenuItems;
+@property (nonatomic, strong) NSMenuItem * summaryItem;
 @property (nonatomic, assign) BOOL optionKeyDown;
 @property (nonatomic, strong) NSTimer * optionKeyTimer;
 
@@ -213,7 +214,7 @@
 	
 	[self.menu addItemWithTitle:@"Today's Log" action:nil keyEquivalent:@""];
 	[self.menu addItemWithTitle:@"Export JSON" action:nil keyEquivalent:@""].submenu = self.scriptsMenu;
-	[self.menu addItemWithTitle:@"Copy Summary" action:@selector(copyTodaysLog:) keyEquivalent:@"c"];
+	self.summaryItem = [self.menu addItemWithTitle:@"Copy Summary" action:@selector(copyTodaysLog:) keyEquivalent:@"c"];
 	[self.menu addItem:[NSMenuItem separatorItem]];
 	
 	if (self.currentProject)
@@ -258,31 +259,36 @@
 
 - (void)updateMenuItemSuffixes
 {
-	[self updateMenuItemSuffixes:self.projectMenuItems];
-	[self updateMenuItemSuffixes:self.taskMenuItems];
+	for (NSMenuItem * menuItem in self.projectMenuItems)
+	{
+		[self updateMenuItemSuffix:menuItem];
+	}
+	for (NSMenuItem * menuItem in self.taskMenuItems)
+	{
+		[self updateMenuItemSuffix:menuItem];
+	}
+	[self updateMenuItemSuffix:self.summaryItem];
 }
 
-- (void)updateMenuItemSuffixes:(NSArray *)inMenuItems
+- (void)updateMenuItemSuffix:(NSMenuItem *)inMenuItem
 {
 	NSString * suffix = @"...";
-	for (NSMenuItem * menuItem in inMenuItems)
+	
+	if (inMenuItem != self.currentProjectMenuItem && inMenuItem != self.currentTaskMenuItem)
 	{
-		if (menuItem != self.currentProjectMenuItem && menuItem != self.currentTaskMenuItem)
+		NSString * title = inMenuItem.title;
+		if (_optionKeyDown)
 		{
-			NSString * title = menuItem.title;
-			if (_optionKeyDown)
+			if (![title hasSuffix:suffix])
 			{
-				if (![title hasSuffix:suffix])
-				{
-					menuItem.title = [title stringByAppendingString:suffix];
-				}
+				inMenuItem.title = [title stringByAppendingString:suffix];
 			}
-			else
+		}
+		else
+		{
+			if ([title hasSuffix:suffix])
 			{
-				if ([title hasSuffix:suffix])
-				{
-					menuItem.title = [title substringToIndex:title.length - suffix.length];
-				}
+				inMenuItem.title = [title substringToIndex:title.length - suffix.length];
 			}
 		}
 	}
@@ -517,9 +523,9 @@
 	}
 }
 
-- (TTLog *)getLogSummaryForDay:(NSDate *)inDay
+- (TTLog *)getLogSummaryForDayStarting:(NSDate *)inStartTime
 {
-	NSArray * events = [[TTController controller] getEventsOnDay:inDay];
+	NSArray * events = [[TTController controller] getEventsFrom:inStartTime to:[inStartTime dateByAddingTimeInterval:24.0*60.0*60.0]];
 	
 	TTLog * log = [TTLog new];
 	for (TTEvent * event in events)
@@ -570,17 +576,63 @@
 
 - (void)runScriptWithTodaysLog:(NSString *)inScriptPath
 {
-	NSDate * now = [NSDate date];
-	TTLog * log = [self getLogSummaryForDay:now];
+	NSDate * startOfToday = TTStartOfDay([NSDate date]);
+	
+	if (self.optionKeyDown)
+	{
+		__weak typeof(self) weakSelf = self;
+		
+		[self showTimestampInputAlert:@"Export JSON for log of day starting:" defaultTime:startOfToday confirmButton:@"Export"
+			completion:^(NSDate *inTimestamp)
+			{
+				if (inTimestamp)
+				{
+					[weakSelf runScript:inScriptPath withLogForDayStarting:inTimestamp];
+				}
+			}
+		];
+	}
+	else
+	{
+		[self runScript:inScriptPath withLogForDayStarting:startOfToday];
+	}
+}
+
+- (void)runScript:(NSString *)inScriptPath withLogForDayStarting:(NSDate *)inStartOfDay
+{
+	TTLog * log = [self getLogSummaryForDayStarting:inStartOfDay];
 	NSString * logString = [self logSummaryToJsonString:log];
 	[self runScript:inScriptPath withInput:logString];
 }
 
 - (void)copyTodaysLog:(NSMenuItem *)inMenuItem
 {
-	NSDate * now = [NSDate date];
-	TTLog * log = [self getLogSummaryForDay:now];
-	NSString * logString = [self logSummaryToString:log date:now];
+	NSDate * startOfToday = TTStartOfDay([NSDate date]);
+	
+	if (self.optionKeyDown)
+	{
+		__weak typeof(self) weakSelf = self;
+		
+		[self showTimestampInputAlert:@"Copy log summary for day starting:" defaultTime:startOfToday confirmButton:@"Copy Log"
+			completion:^(NSDate *inTimestamp)
+			{
+				if (inTimestamp)
+				{
+					[weakSelf copyLogForDayStarting:inTimestamp];
+				}
+			}
+		];
+	}
+	else
+	{
+		[self copyLogForDayStarting:startOfToday];
+	}
+}
+
+- (void)copyLogForDayStarting:(NSDate *)inStartOfDay
+{
+	TTLog * log = [self getLogSummaryForDayStarting:inStartOfDay];
+	NSString * logString = [self logSummaryToString:log date:inStartOfDay];
 	
 	NSLog(@"Log:\n%@", logString);
 
@@ -653,10 +705,9 @@
 	dateFormatter.dateStyle = NSDateFormatterShortStyle;
 	dateFormatter.timeStyle = NSDateFormatterShortStyle;
 	
-	NSDate * now = [NSDate date];
-	NSString * nowString = [dateFormatter stringFromDate:now];
+	NSString * defaultTimeString = [dateFormatter stringFromDate:inDefaultTime ?: [NSDate date]];
 	
-	[self showInputAlert:inMessage defaultText:nowString confirmButton:@"OK"
+	[self showInputAlert:inMessage defaultText:defaultTimeString confirmButton:@"OK"
 		completion:^(NSString * inInputText)
 		{
 			NSDate * timestamp = nil;

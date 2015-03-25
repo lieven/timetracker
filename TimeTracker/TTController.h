@@ -10,7 +10,10 @@
 #import "TTTask.h"
 #import "TTEvent.h"
 
+
 BOOL TTEqualOrBothNil(id inObject1, id inObject2);
+NSDate * TTStartOfDay(NSDate * inDate);
+
 
 @interface TTController : NSObject
 
@@ -33,6 +36,6 @@ BOOL TTEqualOrBothNil(id inObject1, id inObject2);
 - (void)setCurrentProject:(NSString *)inProjectID task:(NSString *)inTaskID;
 - (void)setCurrentProject:(NSString *)inProjectID task:(NSString *)inTaskID time:(NSDate *)inTime;
 
-- (NSArray *)getEventsOnDay:(NSDate *)inTimestamp;
+- (NSArray *)getEventsFrom:(NSDate *)inStartTime to:(NSDate *)inEndTime;
 
 @end
