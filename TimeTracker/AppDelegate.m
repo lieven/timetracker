@@ -574,9 +574,14 @@
 	return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
+- (NSDate *)defaultStartOfDay
+{
+	return [TTStartOfDay([NSDate date]) dateByAddingTimeInterval:4.0*60.0*60.0];
+}
+
 - (void)runScriptWithTodaysLog:(NSString *)inScriptPath
 {
-	NSDate * startOfToday = TTStartOfDay([NSDate date]);
+	NSDate * startOfToday = [self defaultStartOfDay];
 	
 	if (self.optionKeyDown)
 	{
@@ -607,7 +612,7 @@
 
 - (void)copyTodaysLog:(NSMenuItem *)inMenuItem
 {
-	NSDate * startOfToday = TTStartOfDay([NSDate date]);
+	NSDate * startOfToday = [self defaultStartOfDay];
 	
 	if (self.optionKeyDown)
 	{
