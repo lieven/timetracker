@@ -11,6 +11,8 @@
 #import "TTLog+Serialisation.h"
 #import "TTScriptsMenu.h"
 
+#import "TTLogWindowController.h"
+
 
 
 @interface AppDelegate ()< NSMenuDelegate >
@@ -38,6 +40,8 @@
 @property (nonatomic, strong) NSTimer * optionKeyTimer;
 
 @property (nonatomic, strong) TTScriptsMenu * scriptsMenu;
+
+@property (nonatomic, strong) TTLogWindowController * logWindowController;
 
 @end // AppDelegate ()
 
@@ -612,6 +616,13 @@
 
 - (void)copyTodaysLog:(NSMenuItem *)inMenuItem
 {
+	if (! self.logWindowController)
+	{
+		self.logWindowController = [TTLogWindowController new];
+	}
+	
+	[self.logWindowController showWindow:nil];
+	/*
 	NSDate * startOfToday = [self defaultStartOfDay];
 	
 	if (self.optionKeyDown)
@@ -631,7 +642,7 @@
 	else
 	{
 		[self copyLogForDayStarting:startOfToday];
-	}
+	}*/
 }
 
 - (void)copyLogForDayStarting:(NSDate *)inStartOfDay

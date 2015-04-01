@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CA2338941ACB3115006D7C27 /* TTLogWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CA2338931ACB3115006D7C27 /* TTLogWindowController.m */; };
+		CA2338961ACB3137006D7C27 /* TTLogWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CA2338951ACB3137006D7C27 /* TTLogWindowController.xib */; };
 		F124154F1AB76535002355E7 /* NSArray+TTMap.m in Sources */ = {isa = PBXBuildFile; fileRef = F124154E1AB76535002355E7 /* NSArray+TTMap.m */; };
 		F12415521AB76596002355E7 /* TTLog+Serialisation.m in Sources */ = {isa = PBXBuildFile; fileRef = F12415511AB76596002355E7 /* TTLog+Serialisation.m */; };
 		F12415571AB781BD002355E7 /* DefaultScripts in Resources */ = {isa = PBXBuildFile; fileRef = F12415561AB781BD002355E7 /* DefaultScripts */; };
@@ -43,6 +45,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CA2338921ACB3115006D7C27 /* TTLogWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLogWindowController.h; sourceTree = "<group>"; };
+		CA2338931ACB3115006D7C27 /* TTLogWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLogWindowController.m; sourceTree = "<group>"; };
+		CA2338951ACB3137006D7C27 /* TTLogWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TTLogWindowController.xib; sourceTree = "<group>"; };
 		F124154D1AB76535002355E7 /* NSArray+TTMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+TTMap.h"; sourceTree = "<group>"; };
 		F124154E1AB76535002355E7 /* NSArray+TTMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+TTMap.m"; sourceTree = "<group>"; };
 		F12415501AB76596002355E7 /* TTLog+Serialisation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TTLog+Serialisation.h"; sourceTree = "<group>"; };
@@ -153,6 +158,9 @@
 				F12415511AB76596002355E7 /* TTLog+Serialisation.m */,
 				F12415581AB782A3002355E7 /* TTScriptsMenu.h */,
 				F12415591AB782A3002355E7 /* TTScriptsMenu.m */,
+				CA2338921ACB3115006D7C27 /* TTLogWindowController.h */,
+				CA2338931ACB3115006D7C27 /* TTLogWindowController.m */,
+				CA2338951ACB3137006D7C27 /* TTLogWindowController.xib */,
 			);
 			path = TimeTracker;
 			sourceTree = "<group>";
@@ -289,6 +297,7 @@
 			files = (
 				F1E13A3C1AB36D1C00308521 /* Images.xcassets in Resources */,
 				F1E13A3F1AB36D1C00308521 /* MainMenu.xib in Resources */,
+				CA2338961ACB3137006D7C27 /* TTLogWindowController.xib in Resources */,
 				F12415571AB781BD002355E7 /* DefaultScripts in Resources */,
 				F1E13A5B1AB371E000308521 /* timer@2x.png in Resources */,
 				F1E13A5A1AB371E000308521 /* timer.png in Resources */,
@@ -333,6 +342,7 @@
 				F1E13A3A1AB36D1C00308521 /* main.m in Sources */,
 				F1E13A6C1AB372DC00308521 /* FMResultSet.m in Sources */,
 				F1E13A6A1AB372DC00308521 /* FMDatabasePool.m in Sources */,
+				CA2338941ACB3115006D7C27 /* TTLogWindowController.m in Sources */,
 				F124154F1AB76535002355E7 /* NSArray+TTMap.m in Sources */,
 				F1E13A741AB375A100308521 /* TTController.m in Sources */,
 				F1E13A711AB3734000308521 /* TTDatabase.m in Sources */,
