@@ -34,6 +34,7 @@
 @property (nonatomic, strong) NSArray * projectMenuItems;
 @property (nonatomic, strong) NSArray * taskMenuItems;
 @property (nonatomic, strong) NSMenuItem * summaryItem;
+@property (nonatomic, strong) NSMenuItem * monthlySummaryItem;
 @property (nonatomic, assign) BOOL optionKeyDown;
 @property (nonatomic, strong) NSTimer * optionKeyTimer;
 
@@ -215,6 +216,9 @@
 	[self.menu addItemWithTitle:@"Today's Log" action:nil keyEquivalent:@""];
 	[self.menu addItemWithTitle:@"Export JSON" action:nil keyEquivalent:@""].submenu = self.scriptsMenu;
 	self.summaryItem = [self.menu addItemWithTitle:@"Copy Summary" action:@selector(copyTodaysLog:) keyEquivalent:@"c"];
+	[self.menu addItem:[NSMenuItem separatorItem]];
+	[self.menu addItemWithTitle:@"Monthly Total" action:nil keyEquivalent:@""];
+	self.monthlySummaryItem = [self.menu addItemWithTitle:@"Copy..." action:@selector(copyMonthlySummary:) keyEquivalent:@""];
 	[self.menu addItem:[NSMenuItem separatorItem]];
 	
 	if (self.currentProject)
@@ -525,7 +529,12 @@
 
 - (TTLog *)getLogSummaryForDayStarting:(NSDate *)inStartTime
 {
-	NSArray * events = [[TTController controller] getEventsFrom:inStartTime to:[inStartTime dateByAddingTimeInterval:24.0*60.0*60.0]];
+	return [self getLogSummaryFrom:inStartTime to:[inStartTime dateByAddingTimeInterval:24.0*60.0*60.0]];
+}
+
+- (TTLog *)getLogSummaryFrom:(NSDate *)inStartTime to:(NSDate *)inEndTime
+{
+	NSArray * events = [[TTController controller] getEventsFrom:inStartTime to:inEndTime];
 	
 	TTLog * log = [TTLog new];
 	for (TTEvent * event in events)
@@ -643,6 +652,61 @@
 
 	[[NSPasteboard generalPasteboard] declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
 	[[NSPasteboard generalPasteboard] setString:logString forType:NSStringPboardType];
+}
+
+- (void)copyMonthlySummary:(NSMenuItem *)inMenuItem
+{
+	NSDate * startOfMonth = [TTStartOfMonth([NSDate dateWithTimeIntervalSinceNow:-30.0*24.0*60.0*60.0]) dateByAddingTimeInterval:4.0*60.0*60.0];
+	
+	__weak typeof(self) weakSelf = self;
+		
+	[self showTimestampInputAlert:@"Copy summary for month starting:" defaultTime:startOfMonth confirmButton:@"Copy Log"
+		completion:^(NSDate *inTimestamp)
+		{
+			if (inTimestamp)
+			{
+				[weakSelf copyLogForMonthStarting:inTimestamp];
+			}
+		}
+	];
+}
+
+- (void)copyLogForMonthStarting:(NSDate *)inDate
+{
+	NSCalendar * calendar = [NSCalendar currentCalendar];
+	
+	NSDate * endDate = [calendar dateByAddingUnit:NSMonthCalendarUnit value:1 toDate:inDate options:NSCalendarWrapComponents];
+	
+	TTLog * log = [self getLogSummaryFrom:inDate to:endDate];
+	NSString * logString = [self monthlyLogSummary:log date:inDate];
+	
+	NSLog(@"Log:\n%@", logString);
+
+	[[NSPasteboard generalPasteboard] declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
+	[[NSPasteboard generalPasteboard] setString:logString forType:NSStringPboardType];
+}
+
+
+- (NSString *)monthlyLogSummary:(TTLog *)inLog date:(NSDate *)inDate
+{
+	NSMutableString * logString = [NSMutableString new];
+	
+	[logString appendString:@"Month starting "];
+	[logString appendString:[NSDateFormatter localizedStringFromDate:inDate dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterNoStyle]];
+	[logString appendString:@"\n"];
+	
+	
+	for (TTProjectLog * projectLog in inLog.projectLogs.allValues)
+	{
+		double projectWorkDays = projectLog.totalTime/(8.0*3600.0);
+		
+		[logString appendFormat:@"- %@: %.2f d\n",
+			projectLog.projectName,
+			projectWorkDays
+		];
+	}
+	
+	return logString;
 }
 
 - (NSString *)runScript:(NSString *)inScriptPath withInput:(NSString *)inInput

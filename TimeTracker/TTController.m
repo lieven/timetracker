@@ -35,6 +35,13 @@ NSDate * TTStartOfDay(NSDate * inDate)
 	return [calendar dateFromComponents:components];
 }
 
+NSDate * TTStartOfMonth(NSDate * inDate)
+{
+	NSCalendar * calendar = [NSCalendar currentCalendar];
+	NSDateComponents * components = [calendar components:(NSCalendarUnitMonth | NSCalendarUnitYear) fromDate:inDate];
+	return [calendar dateFromComponents:components];
+}
+
 
 @interface TTController ()
 @property (nonatomic, copy) NSString * currentProjectID;

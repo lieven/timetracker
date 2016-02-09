@@ -13,6 +13,7 @@
 
 BOOL TTEqualOrBothNil(id inObject1, id inObject2);
 NSDate * TTStartOfDay(NSDate * inDate);
+NSDate * TTStartOfMonth(NSDate * inDate);
 
 
 @interface TTController : NSObject
