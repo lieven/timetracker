@@ -675,10 +675,29 @@
 {
 	NSCalendar * calendar = [NSCalendar currentCalendar];
 	
-	NSDate * endDate = [calendar dateByAddingUnit:NSMonthCalendarUnit value:1 toDate:inDate options:NSCalendarWrapComponents];
+	NSDate * endDate = [calendar dateByAddingUnit:NSMonthCalendarUnit value:1 toDate:inDate options:0];
 	
 	TTLog * log = [self getLogSummaryFrom:inDate to:endDate];
-	NSString * logString = [self monthlyLogSummary:log date:inDate];
+	NSMutableString * logString = [self monthlyLogSummary:log date:inDate];
+	[logString appendString:@"\n\n"];
+	
+	NSDate * day = inDate;
+	
+	while ([day compare:endDate] == NSOrderedAscending)
+	{
+		TTLog * dayLog = [self getLogSummaryForDayStarting:day];
+		if (dayLog.projectLogs.count > 0)
+		{
+			NSString * dayLogString = [self logSummaryToString:dayLog date:day];
+			
+			[logString appendString:dayLogString];
+			
+			[logString appendString:@"\n"];
+		}
+		
+		day = [calendar dateByAddingUnit:NSDayCalendarUnit value:1 toDate:day options:0];
+	}
+	
 	
 	NSLog(@"Log:\n%@", logString);
 
@@ -687,7 +706,7 @@
 }
 
 
-- (NSString *)monthlyLogSummary:(TTLog *)inLog date:(NSDate *)inDate
+- (NSMutableString *)monthlyLogSummary:(TTLog *)inLog date:(NSDate *)inDate
 {
 	NSMutableString * logString = [NSMutableString new];
 	
@@ -768,11 +787,20 @@
 	}
 }
 
++ (NSDateFormatter *)dateFormatter
+{
+	static NSDateFormatter * sDateFormatter = nil;
+	static dispatch_once_t sOnceToken = 0;
+	dispatch_once(&sOnceToken, ^{
+		sDateFormatter = [NSDateFormatter new];
+		[sDateFormatter setDateFormat:@"yyyy-MM-dd HH:mm"];
+	});
+	return sDateFormatter;
+}
+
 - (void)showTimestampInputAlert:(NSString *)inMessage defaultTime:(NSDate *)inDefaultTime confirmButton:(NSString *)inConfirmButton completion:(void (^)(NSDate * inTimestamp))inCompletionBlock
 {
-	NSDateFormatter * dateFormatter = [NSDateFormatter new];
-	dateFormatter.dateStyle = NSDateFormatterShortStyle;
-	dateFormatter.timeStyle = NSDateFormatterShortStyle;
+	NSDateFormatter * dateFormatter = [self.class dateFormatter];
 	
 	NSString * defaultTimeString = [dateFormatter stringFromDate:inDefaultTime ?: [NSDate date]];
 	
