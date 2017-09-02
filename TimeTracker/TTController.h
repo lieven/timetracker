@@ -25,8 +25,8 @@ NSDate * TTStartOfMonth(NSDate * inDate);
 @property (nonatomic, readonly, copy) NSString * currentProjectID;
 @property (nonatomic, readonly, copy) NSString * currentTaskID;
 
-@property (nonatomic, readonly, strong) NSArray * projects;
-@property (nonatomic, readonly, strong) NSArray * tasks;
+@property (nonatomic, readonly, strong) NSArray< TTProject * > * projects;
+@property (nonatomic, readonly, strong) NSArray< TTTask * > * tasks;
 
 - (TTProject *)addProjectWithName:(NSString *)inName;
 - (BOOL)saveProject:(TTProject *)inProject;
@@ -37,6 +37,6 @@ NSDate * TTStartOfMonth(NSDate * inDate);
 - (void)setCurrentProject:(NSString *)inProjectID task:(NSString *)inTaskID;
 - (void)setCurrentProject:(NSString *)inProjectID task:(NSString *)inTaskID time:(NSDate *)inTime;
 
-- (NSArray *)getEventsFrom:(NSDate *)inStartTime to:(NSDate *)inEndTime;
+- (NSArray< TTEvent * > *)getEventsFrom:(NSDate *)inStartTime to:(NSDate *)inEndTime;
 
 @end

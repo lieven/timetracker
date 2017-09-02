@@ -51,8 +51,8 @@ NSDate * TTStartOfMonth(NSDate * inDate)
 
 @implementation TTController
 {
-	NSMutableArray * _projects;
-	NSMutableArray * _tasks;
+	NSMutableArray< TTProject * > * _projects;
+	NSMutableArray< TTTask * > * _tasks;
 }
 
 + (instancetype)controller
@@ -158,7 +158,7 @@ NSDate * TTStartOfMonth(NSDate * inDate)
 	return self;
 }
 
-- (NSArray *)projects
+- (NSArray< TTProject * > *)projects
 {
 	if (_projects == nil)
 	{
@@ -182,7 +182,7 @@ NSDate * TTStartOfMonth(NSDate * inDate)
 	return [self.database saveProject:inProject];
 }
 
-- (NSArray *)tasks
+- (NSArray< TTTask * > *)tasks
 {
 	if (_tasks == nil && self.currentProjectID)
 	{
@@ -228,7 +228,7 @@ NSDate * TTStartOfMonth(NSDate * inDate)
 	[self.database addEvent:inTime project:inProjectID task:inTaskID];
 }
 
-- (NSArray *)getEventsFrom:(NSDate *)inStartTime to:(NSDate *)inEndTime
+- (NSArray< TTEvent * > *)getEventsFrom:(NSDate *)inStartTime to:(NSDate *)inEndTime
 {
 	return [self.database getEventsFrom:inStartTime to:inEndTime];
 }

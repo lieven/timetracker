@@ -56,10 +56,9 @@
 
 - (NSArray *)getProjects
 {
-	__block NSMutableArray * projects = [NSMutableArray new];
+	__block NSMutableArray< TTProject * > * projects = [NSMutableArray new];
 	
 	[self.queue inDatabase:^(FMDatabase *db) {
-		
 		
 		FMResultSet * results = [db executeQuery:@"SELECT * FROM Projects;"];
 		while ([results next])
@@ -113,9 +112,9 @@
 }
 
 
-- (NSArray *)getTasks:(NSString *)inProjectID
+- (NSArray< TTTask * > *)getTasks:(NSString *)inProjectID
 {
-	__block NSMutableArray * tasks = nil;
+	__block NSMutableArray< TTTask * > * tasks = nil;
 	
 	if (inProjectID)
 	{
@@ -186,9 +185,9 @@
 }
 
 
-- (NSArray *)getEventsFrom:(NSDate *)inStartTime to:(NSDate *)inEndTime
+- (NSArray< TTEvent * > *)getEventsFrom:(NSDate *)inStartTime to:(NSDate *)inEndTime
 {
-	NSMutableArray * events = [NSMutableArray new];
+	NSMutableArray< TTEvent * > * events = [NSMutableArray new];
 	
 	[self.queue inDatabase:^(FMDatabase *db) {
 		FMResultSet * results = [db executeQuery:@"SELECT e.identifier, e.timestamp, e.project AS projectID, p.name AS projectName, e.task AS taskID, t.name AS taskName FROM Events e LEFT JOIN Projects p ON e.project=p.identifier LEFT JOIN Tasks t ON e.task=t.identifier WHERE `timestamp` >= ? AND `timestamp` <= ?", inStartTime, inEndTime];

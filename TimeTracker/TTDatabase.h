@@ -15,13 +15,13 @@
 
 - (instancetype)initWithPath:(NSString *)inPath;
 
-- (NSArray *)getProjects;
+- (NSArray< TTProject * > *)getProjects;
 
 - (TTProject *)addProjectWithName:(NSString *)inName;
 
 - (BOOL)saveProject:(TTProject *)inProject;
 
-- (NSArray *)getTasks:(NSString *)inProjectID;
+- (NSArray< TTTask * > *)getTasks:(NSString *)inProjectID;
 
 - (TTTask *)addTaskWithName:(NSString *)inName project:(NSString *)inProjectID;
 
@@ -29,6 +29,6 @@
 
 - (BOOL)addEvent:(NSDate *)inTime project:(NSString *)inProjectID task:(NSString *)inTaskID;
 
-- (NSArray *)getEventsFrom:(NSDate *)inStartTime to:(NSDate *)inEndTime;
+- (NSArray< TTEvent * > *)getEventsFrom:(NSDate *)inStartTime to:(NSDate *)inEndTime;
 
 @end
