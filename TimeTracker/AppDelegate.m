@@ -68,7 +68,7 @@
 	};
 	
 	
-	[self reloadMenu];
+	[self reloadMenuDelayed];
 	
 	self.statusItem.menu = self.menu;
 }
@@ -125,8 +125,16 @@
 	return attributedTitle;
 }
 
+- (void)reloadMenuDelayed
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(reloadMenu) object:nil];
+    [self performSelector:@selector(reloadMenu) withObject:nil afterDelay:0.5];
+}
+
 - (void)reloadMenu
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(reloadMenu) object:nil];
+    
 	[self.menu removeAllItems];
 	
 	TTController * controller = [TTController controller];
@@ -395,7 +403,7 @@
 	
 	[controller setCurrentProject:inProject.identifier task:nil time:inTimestamp];
 	
-	[self reloadMenu];
+	[self reloadMenuDelayed];
 }
 
 - (void)addProject:(NSMenuItem *)inSender
@@ -409,7 +417,7 @@
 			{
 				if ([[TTController controller] addProjectWithName:inInputText])
 				{
-					[weakSelf reloadMenu];
+					[weakSelf reloadMenuDelayed];
 				}
 				else
 				{
@@ -430,7 +438,7 @@
 		completion:^(NSString *inInputText)
 		{
 			[[TTController controller] addTaskWithName:inInputText];
-			[weakSelf reloadMenu];
+			[weakSelf reloadMenuDelayed];
 		}
 	];
 }
@@ -481,13 +489,13 @@
 	[controller saveTask:inTask];
 	
 	[controller setCurrentProject:controller.currentProjectID task:inTask.identifier time:inTimestamp];
-	[self reloadMenu];
+	[self reloadMenuDelayed];
 }
 
 - (void)stopTracking:(NSMenuItem *)inSender
 {
 	[[TTController controller] setCurrentProject:nil task:nil];
-	[self reloadMenu];
+	[self reloadMenuDelayed];
 }
 
 - (NSArray *)intervalStrings:(NSArray *)inIntervals
