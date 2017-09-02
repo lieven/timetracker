@@ -128,7 +128,7 @@
 - (void)reloadMenuDelayed
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(reloadMenu) object:nil];
-    [self performSelector:@selector(reloadMenu) withObject:nil afterDelay:0.5];
+    [self performSelector:@selector(reloadMenu) withObject:nil afterDelay:0.1];
 }
 
 - (void)reloadMenu
