@@ -155,16 +155,16 @@ NSDate * TTStartOfMonth(NSDate * inDate)
 		[self.class migrate];
 		
 		self.database = [[TTDatabase alloc] initWithPath:[self.class databasePath]];
-        self.currentEvent =  [self.database getLastEvent];
+		self.currentEvent =  [self.database getLastEvent];
 	}
 	return self;
 }
 
 - (void)setCurrentEvent:(TTEvent *)currentEvent
 {
-    _currentEvent = currentEvent;
-    
-    self.currentProjectEvent = currentEvent ? [self.database getProjectEventFor:currentEvent] : nil;
+	_currentEvent = currentEvent;
+	
+	self.currentProjectEvent = currentEvent ? [self.database getProjectEventFor:currentEvent] : nil;
 }
 
 - (NSArray< TTProject * > *)projects
@@ -193,7 +193,7 @@ NSDate * TTStartOfMonth(NSDate * inDate)
 
 - (NSArray< TTTask * > *)tasks
 {
-    NSString * currentProjectID = self.currentEvent.projectID;
+	NSString * currentProjectID = self.currentEvent.projectID;
 	if (_tasks == nil && currentProjectID)
 	{
 		_tasks = [[self.database getTasks:currentProjectID] mutableCopy];
@@ -204,7 +204,7 @@ NSDate * TTStartOfMonth(NSDate * inDate)
 
 - (TTTask *)addTaskWithName:(NSString *)inName
 {
-    NSString * currentProjectID = self.currentEvent.projectID;
+	NSString * currentProjectID = self.currentEvent.projectID;
 	if (currentProjectID)
 	{
 		TTTask * task = [self.database addTaskWithName:inName project:currentProjectID];
@@ -223,17 +223,17 @@ NSDate * TTStartOfMonth(NSDate * inDate)
 
 - (void)setCurrentProject:(NSString *)inProjectID task:(NSString *)inTaskID time:(NSDate *)inTime truncate:(BOOL)inTruncateEvents
 {
-    NSString * currentProjectID = self.currentEvent.projectID;
+	NSString * currentProjectID = self.currentEvent.projectID;
 	if (! TTEqualOrBothNil(currentProjectID, inProjectID))
 	{
 		_tasks = nil;
 	}
 	
 	BOOL added = [self.database addEvent:inTime project:inProjectID task:inTaskID truncate:inTruncateEvents];
-    if (added)
-    {
-        self.currentEvent = [self.database getLastEvent];
-    }
+	if (added)
+	{
+		self.currentEvent = [self.database getLastEvent];
+	}
 }
 
 - (NSArray< TTEvent * > *)getEventsFrom:(NSDate *)inStartTime to:(NSDate *)inEndTime

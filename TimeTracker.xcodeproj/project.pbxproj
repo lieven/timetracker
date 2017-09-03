@@ -117,6 +117,7 @@
 				F1E13A321AB36D1C00308521 /* Products */,
 			);
 			sourceTree = "<group>";
+			usesTabs = 1;
 		};
 		F1E13A321AB36D1C00308521 /* Products */ = {
 			isa = PBXGroup;

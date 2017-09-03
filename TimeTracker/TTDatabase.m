@@ -185,41 +185,41 @@
 - (BOOL)addEvent:(NSDate *)inTime project:(NSString *)inProjectID task:(NSString *)inTaskID truncate:(BOOL)inTruncate
 {
 	__block BOOL inserted = YES;
-    [self.queue inTransaction:^(FMDatabase *db, BOOL *rollback) {
-        if (inTruncate)
-        {
-            [db executeUpdate:@"DELETE FROM Events WHERE `timestamp` >= ?;", inTime];
-        }
-        inserted = [db executeUpdate:@"INSERT INTO Events (`project`, `task`, `timestamp`) VALUES(?, ?, ?);", inProjectID, inTaskID, inTime];
-    }];
+	[self.queue inTransaction:^(FMDatabase *db, BOOL *rollback) {
+		if (inTruncate)
+		{
+			[db executeUpdate:@"DELETE FROM Events WHERE `timestamp` >= ?;", inTime];
+		}
+		inserted = [db executeUpdate:@"INSERT INTO Events (`project`, `task`, `timestamp`) VALUES(?, ?, ?);", inProjectID, inTaskID, inTime];
+	}];
 	return inserted;
 }
 
 
 - (NSArray< TTEvent * > *)getEventsFrom:(NSDate *)inStartTime to:(NSDate *)inEndTime
 {
-    if (inStartTime == nil)
-    {
-        return nil;
-    }
-    
+	if (inStartTime == nil)
+	{
+		return nil;
+	}
+	
 	NSMutableArray< TTEvent * > * events = [NSMutableArray new];
-    
+	
 	[self.queue inDatabase:^(FMDatabase *db) {
-        NSString * query = SELECT_EVENT_QUERY " WHERE `timestamp` >= ?";
-        if (inEndTime)
-        {
-            query = [query stringByAppendingString:@" AND `timestamp` <= ?"];
-        }
-        query = [query stringByAppendingString:@" ORDER BY `timestamp`"];
+		NSString * query = SELECT_EVENT_QUERY " WHERE `timestamp` >= ?";
+		if (inEndTime)
+		{
+			query = [query stringByAppendingString:@" AND `timestamp` <= ?"];
+		}
+		query = [query stringByAppendingString:@" ORDER BY `timestamp`"];
 		FMResultSet * results = [db executeQuery:query, inStartTime, inEndTime];
 		while ([results next])
 		{
 			TTEvent * event = [TTEvent eventWithResultSet:results];
-            if (event)
-            {
-                [events addObject:event];
-            }
+			if (event)
+			{
+				[events addObject:event];
+			}
 		}
 	}];
 	
@@ -228,41 +228,41 @@
 
 - (TTEvent *)getLastEvent
 {
-    NSString * query = SELECT_EVENT_QUERY " ORDER BY `timestamp` DESC LIMIT 1";
-    return [self getEventWithQuery:query args:nil];
+	NSString * query = SELECT_EVENT_QUERY " ORDER BY `timestamp` DESC LIMIT 1";
+	return [self getEventWithQuery:query args:nil];
 }
 
 
 - (TTEvent *)getProjectEventFor:(TTEvent *)inEvent
 {
-    NSString * projectID = inEvent.projectID;
-    NSDate * timestamp = inEvent.time;
-    if (projectID == nil || timestamp == nil)
-    {
-        return nil;
-    }
-    
-    if (inEvent.taskID == nil)
-    {
-        return inEvent;
-    }
-    
-    NSString * query = SELECT_EVENT_QUERY " WHERE e.project=? AND e.timestamp < ? ORDER BY e.timestamp DESC LIMIT 1;";
-    return [self getEventWithQuery:query args:@[ projectID, timestamp ]];
+	NSString * projectID = inEvent.projectID;
+	NSDate * timestamp = inEvent.time;
+	if (projectID == nil || timestamp == nil)
+	{
+		return nil;
+	}
+	
+	if (inEvent.taskID == nil)
+	{
+		return inEvent;
+	}
+	
+	NSString * query = SELECT_EVENT_QUERY " WHERE e.project=? AND e.timestamp < ? ORDER BY e.timestamp DESC LIMIT 1;";
+	return [self getEventWithQuery:query args:@[ projectID, timestamp ]];
 }
 
 - (TTEvent *)getEventWithQuery:(NSString *)inQuery args:(NSArray *)inArgs
 {
-    __block TTEvent * result = nil;
-    [self.queue inDatabase:^(FMDatabase *db) {
+	__block TTEvent * result = nil;
+	[self.queue inDatabase:^(FMDatabase *db) {
 		FMResultSet * resultSet = [db executeQuery:inQuery withArgumentsInArray:inArgs ?: @[]];
-        if ([resultSet next])
-        {
-            result = [TTEvent eventWithResultSet:resultSet];
-            [resultSet close];
-        }
-    }];
-    return result;
+		if ([resultSet next])
+		{
+			result = [TTEvent eventWithResultSet:resultSet];
+			[resultSet close];
+		}
+	}];
+	return result;
 }
 
 @end // TTDatabase
@@ -272,20 +272,20 @@
 
 + (TTEvent *)eventWithResultSet:(FMResultSet *)inResultSet
 {
-    NSString * identifier = [inResultSet stringForColumn:@"identifier"];
-    if (identifier == nil)
-    {
-        return nil;
-    }
-    
-    TTEvent * event = [TTEvent new];
-    event.identifier = identifier;
-    event.time = [inResultSet dateForColumn:@"timestamp"];
-    event.projectID = [inResultSet stringForColumn:@"projectID"];
-    event.projectName = [inResultSet stringForColumn:@"projectName"];
-    event.taskID = [inResultSet stringForColumn:@"taskID"];
-    event.taskName = [inResultSet stringForColumn:@"taskName"];
-    return event;
+	NSString * identifier = [inResultSet stringForColumn:@"identifier"];
+	if (identifier == nil)
+	{
+		return nil;
+	}
+	
+	TTEvent * event = [TTEvent new];
+	event.identifier = identifier;
+	event.time = [inResultSet dateForColumn:@"timestamp"];
+	event.projectID = [inResultSet stringForColumn:@"projectID"];
+	event.projectName = [inResultSet stringForColumn:@"projectName"];
+	event.taskID = [inResultSet stringForColumn:@"taskID"];
+	event.taskName = [inResultSet stringForColumn:@"taskName"];
+	return event;
 }
 
 @end // TTEvent (Database)
