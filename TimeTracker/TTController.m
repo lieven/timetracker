@@ -44,8 +44,9 @@ NSDate * TTStartOfMonth(NSDate * inDate)
 
 
 @interface TTController ()
-@property (nonatomic, copy) NSString * currentProjectID;
-@property (nonatomic, copy) NSString * currentTaskID;
+@property (nonatomic, strong) TTEvent * currentEvent;
+@property (nonatomic, strong) TTEvent * currentProjectEvent;
+
 @property (nonatomic, strong) TTDatabase * database;
 @end // TTController ()
 
@@ -154,8 +155,16 @@ NSDate * TTStartOfMonth(NSDate * inDate)
 		[self.class migrate];
 		
 		self.database = [[TTDatabase alloc] initWithPath:[self.class databasePath]];
+        self.currentEvent =  [self.database getLastEvent];
 	}
 	return self;
+}
+
+- (void)setCurrentEvent:(TTEvent *)currentEvent
+{
+    _currentEvent = currentEvent;
+    
+    self.currentProjectEvent = currentEvent ? [self.database getProjectEventFor:currentEvent] : nil;
 }
 
 - (NSArray< TTProject * > *)projects
@@ -184,9 +193,10 @@ NSDate * TTStartOfMonth(NSDate * inDate)
 
 - (NSArray< TTTask * > *)tasks
 {
-	if (_tasks == nil && self.currentProjectID)
+    NSString * currentProjectID = self.currentEvent.projectID;
+	if (_tasks == nil && currentProjectID)
 	{
-		_tasks = [[self.database getTasks:self.currentProjectID] mutableCopy];
+		_tasks = [[self.database getTasks:currentProjectID] mutableCopy];
 	}
 	return _tasks;
 	
@@ -194,9 +204,10 @@ NSDate * TTStartOfMonth(NSDate * inDate)
 
 - (TTTask *)addTaskWithName:(NSString *)inName
 {
-	if (self.currentProjectID)
+    NSString * currentProjectID = self.currentEvent.projectID;
+	if (currentProjectID)
 	{
-		TTTask * task = [self.database addTaskWithName:inName project:self.currentProjectID];
+		TTTask * task = [self.database addTaskWithName:inName project:currentProjectID];
 		if (task)
 		{
 			[_tasks addObject:task];
@@ -210,22 +221,19 @@ NSDate * TTStartOfMonth(NSDate * inDate)
 	return [self.database saveTask:inTask];
 }
 
-- (void)setCurrentProject:(NSString *)inProjectID task:(NSString *)inTaskID
+- (void)setCurrentProject:(NSString *)inProjectID task:(NSString *)inTaskID time:(NSDate *)inTime truncate:(BOOL)inTruncateEvents
 {
-	[self setCurrentProject:inProjectID task:inTaskID time:[NSDate date]];
-}
-
-- (void)setCurrentProject:(NSString *)inProjectID task:(NSString *)inTaskID time:(NSDate *)inTime
-{
-	if (! TTEqualOrBothNil(self.currentProjectID, inProjectID))
+    NSString * currentProjectID = self.currentEvent.projectID;
+	if (! TTEqualOrBothNil(currentProjectID, inProjectID))
 	{
 		_tasks = nil;
 	}
 	
-	self.currentProjectID = inProjectID;
-	self.currentTaskID = inTaskID;
-	
-	[self.database addEvent:inTime project:inProjectID task:inTaskID];
+	BOOL added = [self.database addEvent:inTime project:inProjectID task:inTaskID truncate:inTruncateEvents];
+    if (added)
+    {
+        self.currentEvent = [self.database getLastEvent];
+    }
 }
 
 - (NSArray< TTEvent * > *)getEventsFrom:(NSDate *)inStartTime to:(NSDate *)inEndTime
