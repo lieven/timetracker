@@ -68,7 +68,7 @@
 	};
 	
 	
-	[self reloadMenuDelayed];
+	[self reloadMenu];
 	
 	self.statusItem.menu = self.menu;
 }
