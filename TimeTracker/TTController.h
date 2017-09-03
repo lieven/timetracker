@@ -22,8 +22,8 @@ NSDate * TTStartOfMonth(NSDate * inDate);
 
 + (NSString *)scriptsFolder;
 
-@property (nonatomic, readonly, copy) NSString * currentProjectID;
-@property (nonatomic, readonly, copy) NSString * currentTaskID;
+@property (nonatomic, readonly, strong) TTEvent * currentEvent;
+@property (nonatomic, readonly, strong) TTEvent * currentProjectEvent;
 
 @property (nonatomic, readonly, strong) NSArray< TTProject * > * projects;
 @property (nonatomic, readonly, strong) NSArray< TTTask * > * tasks;
@@ -34,8 +34,7 @@ NSDate * TTStartOfMonth(NSDate * inDate);
 - (TTTask *)addTaskWithName:(NSString *)inName;
 - (BOOL)saveTask:(TTTask *)inTask;
 
-- (void)setCurrentProject:(NSString *)inProjectID task:(NSString *)inTaskID;
-- (void)setCurrentProject:(NSString *)inProjectID task:(NSString *)inTaskID time:(NSDate *)inTime;
+- (void)setCurrentProject:(NSString *)inProjectID task:(NSString *)inTaskID time:(NSDate *)inTime truncate:(BOOL)inTrunate;
 
 - (NSArray< TTEvent * > *)getEventsFrom:(NSDate *)inStartTime to:(NSDate *)inEndTime;
 

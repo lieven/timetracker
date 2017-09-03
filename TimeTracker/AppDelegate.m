@@ -25,9 +25,6 @@
 
 @property (nonatomic, assign, getter=isTracking) BOOL tracking;
 
-@property (nonatomic, weak) TTProject * currentProject;
-@property (nonatomic, weak) TTTask * currentTask;
-
 @property (nonatomic, weak) NSMenuItem * currentProjectMenuItem;
 @property (nonatomic, weak) NSMenuItem * currentTaskMenuItem;
 
@@ -35,6 +32,7 @@
 @property (nonatomic, strong) NSArray * taskMenuItems;
 @property (nonatomic, strong) NSMenuItem * summaryItem;
 @property (nonatomic, strong) NSMenuItem * monthlySummaryItem;
+@property (nonatomic, strong) NSMenuItem * stopTrackingItem;
 @property (nonatomic, assign) BOOL optionKeyDown;
 @property (nonatomic, strong) NSTimer * optionKeyTimer;
 
@@ -47,8 +45,6 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)inNotification
 {
-	[[TTController controller] setCurrentProject:nil task:nil];
-	
     NSImage *statusItemImage = [NSImage imageNamed:@"timer"];
     [statusItemImage setTemplate:YES];
     
@@ -75,7 +71,7 @@
 
 - (void)applicationWillTerminate:(NSNotification *)inNotification
 {
-	[[TTController controller] setCurrentProject:nil task:nil];
+	[[TTController controller] setCurrentProject:nil task:nil time:[NSDate date] truncate:NO];
 }
 
 - (NSArray *)addItems:(NSArray *)inItems toMenu:(NSMenu *)inMenu action:(SEL)inAction overflow:(NSString *)inOverflowTitle titleKey:(NSString *)inTitleKey update:(void (^)(id inItem, NSMenuItem * inMenuItem))inUpdateBlock
@@ -139,12 +135,14 @@
 	
 	TTController * controller = [TTController controller];
 	
+    TTEvent * currentEvent = controller.currentEvent;
+    NSString * currentProjectID = currentEvent.projectID;
+    NSString * currentTaskID = currentEvent.taskID;
+    
+    
 	// Projects
 	
 	__weak typeof(self) weakSelf = self;
-	
-	self.currentProject = nil;
-	self.currentTask = nil;
 	
 	self.projectsSubmenu = [[NSMenu alloc] initWithTitle:@""];
 	
@@ -156,9 +154,8 @@
 	self.projectMenuItems = [self addItems:self.projects toMenu:self.projectsSubmenu action:@selector(selectProject:) overflow:@"Older Projects" titleKey:@"name"
 		update:^(TTProject * inProject, NSMenuItem * inMenuItem)
 		{
-			if (weakSelf.currentProject == nil && [controller.currentProjectID isEqualTo:inProject.identifier])
+			if ([currentProjectID isEqualTo:inProject.identifier])
 			{
-				weakSelf.currentProject = inProject;
 				inMenuItem.state = NSOnState;
 				inMenuItem.action = nil;
 			}
@@ -187,23 +184,30 @@
 	[self.menu addItem:[NSMenuItem separatorItem]];
 	
 	
-	if (self.currentProject)
+	if (currentProjectID)
 	{
-		projectsSubmenuItem.title = self.currentProject.name ?: @"Untitled Project";
-		self.tasks = [controller.tasks sortedArrayUsingDescriptors:@[
+        projectsSubmenuItem.title = currentEvent.projectName ?: @"Untitled Project";
+		NSArray< TTTask * > * tasks = [controller.tasks sortedArrayUsingDescriptors:@[
 			[NSSortDescriptor sortDescriptorWithKey:@"self.lastUse" ascending:NO],
 			[NSSortDescriptor sortDescriptorWithKey:@"self.name" ascending:YES]
 		]];
+        
+        const NSUInteger maxTasks = 55;
+        if (tasks.count > maxTasks)
+        {
+            tasks = [tasks subarrayWithRange:NSMakeRange(0, maxTasks)];
+        }
+        self.tasks = tasks;
+        
 		
 		NSMenu * menu = self.menu;
 		
 		
-		self.taskMenuItems = [self addItems:self.tasks toMenu:menu action:@selector(selectTask:) overflow:@"Older Tasks" titleKey:@"name"
+		self.taskMenuItems = [self addItems:tasks toMenu:menu action:@selector(selectTask:) overflow:@"Older Tasks" titleKey:@"name"
 			update:^(TTTask * inTask, NSMenuItem * inMenuItem)
 			{
-				if (weakSelf.currentTask == nil && [controller.currentTaskID isEqualTo:inTask.identifier])
+				if ([currentTaskID isEqualTo:inTask.identifier])
 				{
-					weakSelf.currentTask = inTask;
 					weakSelf.currentTaskMenuItem = inMenuItem;
 					inMenuItem.state = NSOnState;
 				}
@@ -229,25 +233,29 @@
 	self.monthlySummaryItem = [self.menu addItemWithTitle:@"Copy..." action:@selector(copyMonthlySummary:) keyEquivalent:@""];
 	[self.menu addItem:[NSMenuItem separatorItem]];
 	
-	if (self.currentProject)
+	if (currentProjectID)
 	{
-		[self.menu addItemWithTitle:@"Stop Tracking" action:@selector(stopTracking:) keyEquivalent:@""];
+		self.stopTrackingItem = [self.menu addItemWithTitle:@"Stop Tracking" action:@selector(stopTracking:) keyEquivalent:@""];
 	}
+    else
+    {
+        self.stopTrackingItem = nil;
+    }
 	
 	[self.menu addItemWithTitle:@"Quit" action:@selector(terminate:) keyEquivalent:@"q"];
 	
 	
 	// Update main menu title
 	
-	if (self.currentProject)
+	if (currentProjectID)
 	{
-		if (self.currentTask)
+		if (currentTaskID)
 		{
-			self.statusItem.title = self.currentTask.name;
+			self.statusItem.title = currentEvent.taskName;
 		}
 		else
 		{
-			self.statusItem.title = self.currentProject.name;
+			self.statusItem.title = currentEvent.projectName;
 		}
 	}
 	else
@@ -258,14 +266,18 @@
 
 - (void)updateTime
 {
-	if (self.currentProjectMenuItem && self.currentProject)
+    TTController * controller = [TTController controller];
+    TTEvent * currentEvent = controller.currentEvent;
+    
+	if (self.currentProjectMenuItem && currentEvent.projectID)
 	{
-		self.currentProjectMenuItem.attributedTitle = [AppDelegate attributedTitle:self.currentProject.name time:-[self.currentProject.lastUse timeIntervalSinceNow]];
+        TTEvent * currentProjectEvent = controller.currentProjectEvent;
+		self.currentProjectMenuItem.attributedTitle = [AppDelegate attributedTitle:currentEvent.projectName time:-[currentProjectEvent.time timeIntervalSinceNow]];
 	}
 	
-	if (self.currentTaskMenuItem && self.currentTask)
+	if (self.currentTaskMenuItem && currentEvent.taskID)
 	{
-		self.currentTaskMenuItem.attributedTitle = [AppDelegate attributedTitle:self.currentTask.name time:-[self.currentTask.lastUse timeIntervalSinceNow]];
+		self.currentTaskMenuItem.attributedTitle = [AppDelegate attributedTitle:currentEvent.taskName time:-[currentEvent.time timeIntervalSinceNow]];
 	}
 }
 
@@ -280,6 +292,7 @@
 		[self updateMenuItemSuffix:menuItem];
 	}
 	[self updateMenuItemSuffix:self.summaryItem];
+	[self updateMenuItemSuffix:self.stopTrackingItem];
 }
 
 - (void)updateMenuItemSuffix:(NSMenuItem *)inMenuItem
@@ -397,13 +410,10 @@
 - (void)selectProject:(TTProject *)inProject time:(NSDate *)inTimestamp
 {
 	TTController * controller = [TTController controller];
-	
 	inProject.lastUse = inTimestamp;
 	[controller saveProject:inProject];
 	
-	[controller setCurrentProject:inProject.identifier task:nil time:inTimestamp];
-	
-	[self reloadMenuDelayed];
+	[self selectProject:inProject.identifier task:nil time:inTimestamp];
 }
 
 - (void)addProject:(NSMenuItem *)inSender
@@ -485,30 +495,149 @@
 - (void)selectTask:(TTTask *)inTask time:(NSDate *)inTimestamp
 {
 	TTController * controller = [TTController controller];
-	inTask.lastUse = inTimestamp;
+    inTask.lastUse = inTimestamp;
 	[controller saveTask:inTask];
-	
-	[controller setCurrentProject:controller.currentProjectID task:inTask.identifier time:inTimestamp];
+    
+    [self selectProject:inTask.project task:inTask.identifier time:inTimestamp];
+}
+
+- (NSString *)eventSummary:(TTEvent *)inEvent
+{
+    NSDate * timestamp = inEvent.time;
+    if (timestamp == nil)
+    {
+        return nil;
+    }
+    
+    NSString * result = [[self.class dateFormatter] stringFromDate:timestamp];
+    NSString * projectName = inEvent.projectName;
+    if (projectName)
+    {
+        result = [result stringByAppendingFormat:@": %@", projectName];
+        
+        NSString * taskName = inEvent.taskName;
+        if (taskName)
+        {
+            result = [result stringByAppendingFormat:@" - %@", taskName];
+        }
+    }
+    else
+    {
+        result = [result stringByAppendingString:@": -"];
+    }
+    
+    return result;
+}
+
+- (void)selectProject:(NSString *)inProjectID task:(NSString *)inTaskID time:(NSDate *)inTimestamp
+{
+    TTController * controller = [TTController controller];
+    
+    BOOL truncate = NO;
+    
+    NSArray< TTEvent * > * existingEvents = [controller getEventsFrom:inTimestamp to:nil];
+    NSUInteger existingCount = existingEvents.count;
+    if (existingCount > 0)
+    {
+        NSString * message = nil;
+        if (existingCount == 1)
+        {
+            message = @"There's already an event with a later timestamp.";
+            
+            NSString * summary = [self eventSummary:existingEvents.firstObject];
+            if (summary)
+            {
+                message = [message stringByAppendingFormat:@"\n\n%@", summary];
+            }
+            
+            message = [message stringByAppendingString:@"\n\nDo you want to keep it (new event will be inserted) or start over?"];
+        }
+        else
+        {
+            message = [NSString stringWithFormat:@"There are already %@ events with a later timestamp.\n", @(existingCount)];
+            
+            const NSUInteger maxEvents = 10;
+            const NSUInteger cutoff = maxEvents/2;
+            
+            for (NSUInteger i = 0; i < existingCount; ++i)
+            {
+                NSString * eventSummary = [self eventSummary:existingEvents[i]];
+                if (eventSummary)
+                {
+                    message = [message stringByAppendingFormat:@"\n%@", eventSummary];
+                }
+                
+                if (existingCount > maxEvents && i == cutoff - 1)
+                {
+                    message = [message stringByAppendingString:@"\n..."];
+                    i = existingCount - cutoff - 1;
+                }
+            }
+            
+            message = [message stringByAppendingString:@"\n\nDo you want to keep them (new event will be inserted) or start over?"];
+        }
+        
+        NSAlert * alert = [NSAlert alertWithMessageText:@"Existing Events" defaultButton:@"Keep" alternateButton:@"Cancel" otherButton:@"Start Over" informativeTextWithFormat:@"%@", message];
+        
+        NSInteger button = [alert runModal];
+        switch (button)
+        {
+            case NSAlertDefaultReturn:
+            {
+                truncate = NO;
+                break;
+            }
+            case NSAlertOtherReturn:
+            {
+                truncate = YES;
+                break;
+            }
+            case NSAlertAlternateReturn:
+            default:
+            {
+                return; // Cancel
+            }
+        }
+    }
+    
+    [self selectProject:inProjectID task:inTaskID time:inTimestamp truncate:truncate];
+}
+
+- (void)selectProject:(NSString *)inProjectID task:(NSString *)inTaskID time:(NSDate *)inTimestamp truncate:(BOOL)inTruncate
+{
+    [[TTController controller] setCurrentProject:inProjectID task:inTaskID time:inTimestamp truncate:inTruncate];
 	[self reloadMenuDelayed];
 }
 
 - (void)stopTracking:(NSMenuItem *)inSender
 {
-	[[TTController controller] setCurrentProject:nil task:nil];
-	[self reloadMenuDelayed];
+    if (self.optionKeyDown)
+    {
+        __weak typeof(self) weakSelf = self;
+        NSString * message = @"Enter the time you stopped working";
+        [self showTimestampInputAlert:message defaultTime:[NSDate date] confirmButton:@"OK"
+            completion:^(NSDate *inTimestamp)
+            {
+                if (inTimestamp)
+                {
+                    [weakSelf stopTrackingAtTimestamp:inTimestamp];
+                }
+                else
+                {
+                    NSBeep();
+                }
+            }
+        ];
+    }
+    else
+    {
+        [self stopTrackingAtTimestamp:[NSDate date]];
+    }
 }
 
-- (NSArray *)intervalStrings:(NSArray *)inIntervals
+- (void)stopTrackingAtTimestamp:(NSDate *)inTimestamp
 {
-	NSMutableArray * strings = [NSMutableArray new];
-	for (TTInterval * interval in inIntervals)
-	{
-		[strings addObject:[NSString stringWithFormat:@" %@ - %@",
-			[NSDateFormatter localizedStringFromDate:interval.startTime dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle],
-			[NSDateFormatter localizedStringFromDate:interval.endTime dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle]
-		]];
-	}
-	return strings;
+    [self selectProject:nil task:nil time:inTimestamp];
 }
 
 + (NSString *)durationString:(NSTimeInterval)inTimeInterval
