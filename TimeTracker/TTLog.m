@@ -63,7 +63,15 @@
 	NSTimeInterval result = 0.0;
 	for (TTInterval * interval in _intervals)
 	{
-		result += interval.duration;
+		NSTimeInterval intervalDuration = interval.duration;
+		if (intervalDuration > 0.0)
+		{
+			result += intervalDuration;
+		}
+		else
+		{
+			NSLog(@"WARNING");
+		}
 	}
 	return result;
 }

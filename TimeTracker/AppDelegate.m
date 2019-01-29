@@ -898,30 +898,32 @@
 	textField.stringValue = inDefaultText;
 	alert.accessoryView = textField;
 	
-	NSString * resultText = nil;
 	
 	[[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 	
-	NSInteger button = [alert runModal];
-	switch (button)
-	{
-		case NSAlertDefaultReturn:
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+		NSString * resultText = nil;
+		NSInteger button = [alert runModal];
+		switch (button)
 		{
-			[textField validateEditing];
-			resultText = textField.stringValue;
-			break;
+			case NSAlertDefaultReturn:
+			{
+				[textField validateEditing];
+				resultText = textField.stringValue;
+				break;
+			}
+			default:
+			{
+				// Canceled
+				break;
+			}
 		}
-		default:
+		
+		if (inCompletionBlock)
 		{
-			// Canceled
-			break;
+			inCompletionBlock(resultText);
 		}
-	}
-	
-	if (inCompletionBlock)
-	{
-		inCompletionBlock(resultText);
-	}
+	});
 }
 
 + (NSDateFormatter *)dateFormatter

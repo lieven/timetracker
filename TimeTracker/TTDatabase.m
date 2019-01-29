@@ -206,12 +206,12 @@
 	NSMutableArray< TTEvent * > * events = [NSMutableArray new];
 	
 	[self.queue inDatabase:^(FMDatabase *db) {
-		NSString * query = SELECT_EVENT_QUERY " WHERE `timestamp` >= ?";
+		NSString * query = SELECT_EVENT_QUERY " WHERE e.timestamp >= ?";
 		if (inEndTime)
 		{
-			query = [query stringByAppendingString:@" AND `timestamp` <= ?"];
+			query = [query stringByAppendingString:@" AND e.timestamp <= ?"];
 		}
-		query = [query stringByAppendingString:@" ORDER BY `timestamp`"];
+		query = [query stringByAppendingString:@" ORDER BY e.timestamp, e.identifier"];
 		FMResultSet * results = [db executeQuery:query, inStartTime, inEndTime];
 		while ([results next])
 		{
@@ -228,7 +228,7 @@
 
 - (TTEvent *)getLastEvent
 {
-	NSString * query = SELECT_EVENT_QUERY " ORDER BY `timestamp` DESC LIMIT 1";
+	NSString * query = SELECT_EVENT_QUERY " ORDER BY e.timestamp DESC, e.identifier DESC LIMIT 1";
 	return [self getEventWithQuery:query args:nil];
 }
 
@@ -247,7 +247,7 @@
 		return inEvent;
 	}
 	
-	NSString * query = SELECT_EVENT_QUERY " WHERE e.project=? AND e.timestamp < ? ORDER BY e.timestamp DESC LIMIT 1;";
+	NSString * query = SELECT_EVENT_QUERY " WHERE e.project=? AND e.timestamp < ? ORDER BY e.timestamp DESC, e.identifier DESC LIMIT 1;";
 	return [self getEventWithQuery:query args:@[ projectID, timestamp ]];
 }
 
