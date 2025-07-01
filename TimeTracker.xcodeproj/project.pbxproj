@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CA51C9232E13D0E600AF98D0 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = CA51C9222E13D0E600AF98D0 /* libsqlite3.tbd */; };
 		F124154F1AB76535002355E7 /* NSArray+TTMap.m in Sources */ = {isa = PBXBuildFile; fileRef = F124154E1AB76535002355E7 /* NSArray+TTMap.m */; };
 		F12415521AB76596002355E7 /* TTLog+Serialisation.m in Sources */ = {isa = PBXBuildFile; fileRef = F12415511AB76596002355E7 /* TTLog+Serialisation.m */; };
 		F12415571AB781BD002355E7 /* DefaultScripts in Resources */ = {isa = PBXBuildFile; fileRef = F12415561AB781BD002355E7 /* DefaultScripts */; };
@@ -23,7 +24,6 @@
 		F1E13A6A1AB372DC00308521 /* FMDatabasePool.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A621AB372DC00308521 /* FMDatabasePool.m */; };
 		F1E13A6B1AB372DC00308521 /* FMDatabaseQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A641AB372DC00308521 /* FMDatabaseQueue.m */; };
 		F1E13A6C1AB372DC00308521 /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A671AB372DC00308521 /* FMResultSet.m */; };
-		F1E13A6E1AB372EE00308521 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F1E13A6D1AB372EE00308521 /* libsqlite3.dylib */; };
 		F1E13A711AB3734000308521 /* TTDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A701AB3734000308521 /* TTDatabase.m */; };
 		F1E13A741AB375A100308521 /* TTController.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A731AB375A100308521 /* TTController.m */; };
 		F1E13A771AB3790200308521 /* TTProject.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E13A761AB3790200308521 /* TTProject.m */; };
@@ -43,6 +43,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CA51C9222E13D0E600AF98D0 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		F124154D1AB76535002355E7 /* NSArray+TTMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+TTMap.h"; sourceTree = "<group>"; };
 		F124154E1AB76535002355E7 /* NSArray+TTMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+TTMap.m"; sourceTree = "<group>"; };
 		F12415501AB76596002355E7 /* TTLog+Serialisation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TTLog+Serialisation.h"; sourceTree = "<group>"; };
@@ -73,7 +74,6 @@
 		F1E13A651AB372DC00308521 /* FMDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDB.h; sourceTree = "<group>"; };
 		F1E13A661AB372DC00308521 /* FMResultSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMResultSet.h; sourceTree = "<group>"; };
 		F1E13A671AB372DC00308521 /* FMResultSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMResultSet.m; sourceTree = "<group>"; };
-		F1E13A6D1AB372EE00308521 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		F1E13A6F1AB3734000308521 /* TTDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTDatabase.h; sourceTree = "<group>"; };
 		F1E13A701AB3734000308521 /* TTDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTDatabase.m; sourceTree = "<group>"; };
 		F1E13A721AB375A100308521 /* TTController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTController.h; sourceTree = "<group>"; };
@@ -93,7 +93,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F1E13A6E1AB372EE00308521 /* libsqlite3.dylib in Frameworks */,
+				CA51C9232E13D0E600AF98D0 /* libsqlite3.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -107,14 +107,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		CA51C9212E13D0E600AF98D0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				CA51C9222E13D0E600AF98D0 /* libsqlite3.tbd */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F1E13A281AB36D1C00308521 = {
 			isa = PBXGroup;
 			children = (
-				F1E13A6D1AB372EE00308521 /* libsqlite3.dylib */,
 				F1E13A5C1AB372DC00308521 /* fmdb */,
 				F1E13A331AB36D1C00308521 /* TimeTracker */,
 				F1E13A471AB36D1C00308521 /* TimeTrackerTests */,
 				F1E13A321AB36D1C00308521 /* Products */,
+				CA51C9212E13D0E600AF98D0 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 			usesTabs = 1;
@@ -269,6 +277,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);

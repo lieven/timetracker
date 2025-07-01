@@ -37,6 +37,7 @@
 @property (nonatomic, strong) NSTimer * optionKeyTimer;
 
 @property (nonatomic, strong) TTScriptsMenu * scriptsMenu;
+@property (nonatomic, strong) TTScriptsMenu * monthlyScriptsMenu;
 
 @end // AppDelegate ()
 
@@ -60,9 +61,14 @@
 	self.scriptsMenu = [[TTScriptsMenu alloc] initWithFolder:[TTController scriptsFolder]];
 	self.scriptsMenu.onRunScript = ^(NSString * inScriptPath)
 	{
-		[weakSelf runScriptWithTodaysLog:inScriptPath];
+		[weakSelf runScriptWithDailyLog:inScriptPath];
 	};
 	
+	self.monthlyScriptsMenu = [[TTScriptsMenu alloc] initWithFolder:[TTController scriptsFolder]];
+	self.monthlyScriptsMenu.onRunScript = ^(NSString * inScriptPath)
+	{
+		[weakSelf runScriptWithMonthlyLog:inScriptPath];
+	};
 	
 	[self reloadMenu];
 	
@@ -230,7 +236,8 @@
 	self.summaryItem = [self.menu addItemWithTitle:@"Copy Summary" action:@selector(copyTodaysLog:) keyEquivalent:@"c"];
 	[self.menu addItem:[NSMenuItem separatorItem]];
 	[self.menu addItemWithTitle:@"Monthly Total" action:nil keyEquivalent:@""];
-	self.monthlySummaryItem = [self.menu addItemWithTitle:@"Copy..." action:@selector(copyMonthlySummary:) keyEquivalent:@""];
+	[self.menu addItemWithTitle:@"Export JSON" action:nil keyEquivalent:@""].submenu = self.monthlyScriptsMenu;
+	self.monthlySummaryItem = [self.menu addItemWithTitle:@"Copy Summary..." action:@selector(copyMonthlySummary:) keyEquivalent:@""];
 	[self.menu addItem:[NSMenuItem separatorItem]];
 	
 	if (currentProjectID)
@@ -669,6 +676,15 @@
 	return [self getLogSummaryFrom:inStartTime to:[inStartTime dateByAddingTimeInterval:24.0*60.0*60.0]];
 }
 
+- (TTLog *)getLogSummaryForMonthStarting:(NSDate *)inStartDate
+{
+	NSCalendar * calendar = [NSCalendar currentCalendar];
+	
+	NSDate * endDate = [calendar dateByAddingUnit:NSMonthCalendarUnit value:1 toDate:inStartDate options:0];
+	
+	return [self getLogSummaryFrom:inStartDate to:endDate];
+}
+
 - (TTLog *)getLogSummaryFrom:(NSDate *)inStartTime to:(NSDate *)inEndTime
 {
 	NSArray * events = [[TTController controller] getEventsFrom:inStartTime to:inEndTime];
@@ -725,7 +741,12 @@
 	return [TTStartOfDay([NSDate date]) dateByAddingTimeInterval:4.0*60.0*60.0];
 }
 
-- (void)runScriptWithTodaysLog:(NSString *)inScriptPath
+- (NSDate *)defaultStartOfMonth
+{
+	return [TTStartOfMonth([NSDate dateWithTimeIntervalSinceNow:-30.0*24.0*60.0*60.0]) dateByAddingTimeInterval:4.0*60.0*60.0];
+}
+
+- (void)runScriptWithDailyLog:(NSString *)inScriptPath
 {
 	NSDate * startOfToday = [self defaultStartOfDay];
 	
@@ -752,6 +773,37 @@
 - (void)runScript:(NSString *)inScriptPath withLogForDayStarting:(NSDate *)inStartOfDay
 {
 	TTLog * log = [self getLogSummaryForDayStarting:inStartOfDay];
+	NSString * logString = [self logSummaryToJsonString:log];
+	[self runScript:inScriptPath withInput:logString];
+}
+
+- (void)runScriptWithMonthlyLog:(NSString *)inScriptPath
+{
+	NSDate * startOfToday = [self defaultStartOfDay];
+	
+	if (self.optionKeyDown)
+	{
+		__weak typeof(self) weakSelf = self;
+		
+		[self showTimestampInputAlert:@"Export JSON for log of month starting:" defaultTime:startOfToday confirmButton:@"Export"
+			completion:^(NSDate *inTimestamp)
+			{
+				if (inTimestamp)
+				{
+					[weakSelf runScript:inScriptPath withLogForMonthStarting:inTimestamp];
+				}
+			}
+		];
+	}
+	else
+	{
+		[self runScript:inScriptPath withLogForDayStarting:startOfToday];
+	}
+}
+
+- (void)runScript:(NSString *)inScriptPath withLogForMonthStarting:(NSDate *)inStartOfMonth
+{
+	TTLog * log = [self getLogSummaryForMonthStarting:inStartOfMonth];
 	NSString * logString = [self logSummaryToJsonString:log];
 	[self runScript:inScriptPath withInput:logString];
 }
@@ -793,7 +845,7 @@
 
 - (void)copyMonthlySummary:(NSMenuItem *)inMenuItem
 {
-	NSDate * startOfMonth = [TTStartOfMonth([NSDate dateWithTimeIntervalSinceNow:-30.0*24.0*60.0*60.0]) dateByAddingTimeInterval:4.0*60.0*60.0];
+	NSDate * startOfMonth = [self defaultStartOfMonth];
 	
 	__weak typeof(self) weakSelf = self;
 		
