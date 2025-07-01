@@ -1,6 +1,5 @@
-#!/usr/bin/env xcrun swift
-
 import Foundation
+import AppKit
 
 var allData = Data()
 while let line = readLine(strippingNewline: false) {
@@ -19,6 +18,9 @@ guard let projects = try? JSONSerialization.jsonObject(with: allData) as? [[Stri
 	exit(1)
 }
 
+
+var csvString = ""
+
 for project in projects {
 	if let tasks = project["tasks"] as? [[String: Any]] {
 		for task in tasks {
@@ -27,8 +29,16 @@ for project in projects {
 				let remainingSeconds = taskDuration - 3600.0 * Double(durationHours)
 				let durationMinutes = Int(round(remainingSeconds / 60.0))
 				
-				print("\(taskName)\t\(String(format: "%02d:%02d", durationHours, durationMinutes))\n")
+				let line = "\(taskName)\t\(String(format: "%02d:%02d", durationHours, durationMinutes))\n"
+				csvString.append(line)
 			}
 		}
 	}
 }
+
+let clipboard = NSPasteboard.general
+clipboard.clearContents()
+clipboard.setString(csvString, forType: .string)
+
+
+

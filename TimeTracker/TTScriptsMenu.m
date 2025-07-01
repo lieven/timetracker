@@ -40,7 +40,7 @@
 	NSArray * filenames = [fm contentsOfDirectoryAtPath:scriptsFolder error:&error];
 	for (NSString * filename in filenames)
 	{
-		if ([filename.pathExtension isEqualToString:@"sh"])
+		if ([filename.pathExtension isEqualToString:@"sh"] || [filename.pathExtension isEqualToString:@"swift"])
 		{
 			NSMenuItem * menuItem = [inMenu addItemWithTitle:[filename stringByDeletingPathExtension] action:@selector(runScript:) keyEquivalent:@""];
 			menuItem.target = self;

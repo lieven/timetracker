@@ -232,11 +232,11 @@
 	[self updateTime];
 	
 	[self.menu addItemWithTitle:@"Today's Log" action:nil keyEquivalent:@""];
-	[self.menu addItemWithTitle:@"Export JSON" action:nil keyEquivalent:@""].submenu = self.scriptsMenu;
+	[self.menu addItemWithTitle:@"Export" action:nil keyEquivalent:@""].submenu = self.scriptsMenu;
 	self.summaryItem = [self.menu addItemWithTitle:@"Copy Summary" action:@selector(copyTodaysLog:) keyEquivalent:@"c"];
 	[self.menu addItem:[NSMenuItem separatorItem]];
 	[self.menu addItemWithTitle:@"Monthly Total" action:nil keyEquivalent:@""];
-	[self.menu addItemWithTitle:@"Export JSON" action:nil keyEquivalent:@""].submenu = self.monthlyScriptsMenu;
+	[self.menu addItemWithTitle:@"Export" action:nil keyEquivalent:@""].submenu = self.monthlyScriptsMenu;
 	self.monthlySummaryItem = [self.menu addItemWithTitle:@"Copy Summary..." action:@selector(copyMonthlySummary:) keyEquivalent:@""];
 	[self.menu addItem:[NSMenuItem separatorItem]];
 	
@@ -920,7 +920,19 @@
 - (NSString *)runScript:(NSString *)inScriptPath withInput:(NSString *)inInput
 {
 	NSTask *task = [[NSTask alloc] init];
-	task.launchPath = @"/bin/sh";
+	
+	if ([inScriptPath.pathExtension isEqual:@"sh"])
+	{
+		task.launchPath = @"/bin/sh";
+	}
+	else if ([inScriptPath.pathExtension isEqual:@"swift"])
+	{
+		task.launchPath = @"/usr/bin/swift";
+	}
+	else
+	{
+		return nil;
+	}
 	task.arguments = @[ inScriptPath ];
 
 	NSPipe *readPipe = [NSPipe pipe];
