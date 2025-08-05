@@ -120,7 +120,7 @@
 
 + (NSAttributedString *)attributedTitle:(NSString *)inTitle time:(NSTimeInterval)inTimeInterval
 {
-	NSString * title = [inTitle stringByAppendingFormat:@" (%@)", [self durationString:inTimeInterval]];
+	NSString * title = [(inTitle ? inTitle : @"Unknown") stringByAppendingFormat:@" (%@)", [self durationString:inTimeInterval]];
 	
 	NSMutableAttributedString * attributedTitle = [[NSMutableAttributedString alloc] initWithString:title attributes:@{ NSFontAttributeName: [NSFont menuFontOfSize:0.0] }];
 	[attributedTitle addAttribute:NSForegroundColorAttributeName value:[NSColor lightGrayColor] range:NSMakeRange(inTitle.length, title.length - inTitle.length)];

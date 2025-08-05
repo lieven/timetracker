@@ -155,7 +155,7 @@
 			
 			NSDate * lastUse = [NSDate date];
 			
-			BOOL inserted = [db executeUpdate:@"INSERT INTO Tasks (name, project, lastUse) VALUES(?, ?, ?)", inName, inProjectID, lastUse];
+			BOOL inserted = [db executeUpdate:@"INSERT OR REPLACE INTO Tasks (name, project, lastUse) VALUES(?, ?, ?)", inName, inProjectID, lastUse];
 			if (inserted)
 			{
 				task = [TTTask new];
